@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+<head>
+    <meta charset="UTF-8"><!-- 必须的 meta 标签 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap 的 CSS 文件 -->
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/bootstrap-icons.css">
+    <title>1.1.2(β)医林拾薪刷题工具 By Cirno.9</title>
+    <!--  基础脚本  -->
+    <script src="./js/jquery-3.6.0.min.js"></script>
+    <script src="../../../jquery-3.6.0.min.js"></script>
+    <script src="./js/popper.min.js"></script>
+    <script src="./js/pako.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/nprogress.css" rel="external nofollow">
+    <script src="./js/bootstrap.bundle.min.js"></script>
+    <script src="js/nprogress.js" type="text/javascript"></script>
+    <script src="./js/store.min.js"></script>
+    <link href="./css/buttons.css" rel="stylesheet" type="text/css">
+    <!--  系统脚本需最早加载  -->
+    <script src="../config.js"></script>
+
+    <script src="./js/exercise-common.js?ver=1.1.2"></script>
+    <script src="./js/exercise-log.js?ver=1.1.2"></script>
+    <script src="./js/exercise-settings.js?ver=1.1.2"></script>
+    <script src="./js/exercise-store.js?ver=1.1.2"></script>
+    <script src="./js/api.js?ver=1.1.2"></script>
+    <script src="js/exercise-log.js?ver=1.1.2"></script>
+    <script src="./js/exercise-config.js?ver=1.1.2"></script>
+    <script src="./js/exercise-sync.js?ver=1.1.2"></script>
+    <script src="./js/exercise-tiku.js?ver=1.1.2"></script>
+    <script src="./js/exercise-display.js?ver=1.1.2"></script>
+    <script src="./js/exercise-main.js?ver=1.1.2"></script>
+    <script src="./js/exercise-edit.js?ver=1.1.2"></script>
+    <script src="./js/exercise-update.js?ver=1.1.2"></script>
+    <link href="./css/exercise-comments.css?ver=1.1.2" rel="stylesheet" type="text/css">
+    <link href="./css/exercise-settings.css?ver=1.1.2" rel="stylesheet" type="text/css">
+    <link href="./css/exercise-editor.css?ver=1.1.2" rel="stylesheet" type="text/css">
+    <link href="./css/exercise-timu.css?ver=1.1.2" rel="stylesheet" type="text/css">
+    <link href="./css/exercise-common.css?ver=1.1.2" rel="stylesheet" type="text/css">
+    <link href="./css/exercise-localhistory.css?ver=1.1.2" rel="stylesheet" type="text/css">
+</head>
+<body class="h-100">
+<div class="d-flex flex-column m-0 p-0 min-vh-100 min-vw-100 h-100">
+    <header class="flex-grow-0 flex-shrink-0" type="button" data-toggle="collapse" data-target="#navbarText"
+            aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-xl navbar-light bg-light">
+            <a class="navbar-brand">工具栏</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
+                    aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav ml-4 navbar-nav-scroll" style="z-index: 1">
+                    <li class="nav-item active functions">
+                        <div class="dropdown d-inline">
+                            <button class="button button-primary px-3 rounded-lg dropdown-toggle" type="button"
+                                    id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-question-circle-fill"></i>帮助
+                            </button>
+                            <div class="dropdown-menu" style="z-index: 1060;" aria-labelledby="dropdownMenuButton">
+                                <div class="card-body" style="min-width: 200px">
+                                    <h5 class="card-title">需要帮助?</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">快捷键</h6>
+                                    <p class="card-text">
+                                        上一题:<kbd>↑</kbd>, <kbd>←</kbd>, <kbd>W</kbd>,<kbd>A </kbd><br>
+                                        下一题:<kbd>↓</kbd>, <kbd>→</kbd>, <kbd>S</kbd>,<kbd>D </kbd><br>
+                                        提交:<kbd>ENTER</kbd>, <kbd>SPACE</kbd>
+                                    </p>
+                                    <a target="_blank"
+                                       href="https://www.medforest.cn/dic/%E5%B8%AE%E5%8A%A9:%E5%88%B7%E9%A2%98%E5%B7%A5%E5%85%B7"
+                                       class="card-link">阅读帮助文档</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown d-inline">
+                            <a id="report" class="button px-3 rounded-lg" style="height: 40px"
+                                    href="https://www.medforest.cn/forum/d/59-bugfan-kui-ji-zhong-tie-yi-lin-shi-xin-shua-ti-gong-ju-bugfan-kui-zhuan-yong"
+                                    data-toggle="tooltip" data-placement="bottom" title="反馈BUG">
+                                    <i class="bi bi-arrow-return-left"></i>反馈BUG
+                            </a>
+                        </div>
+                        <div class="dropdown d-inline">
+                            <button id="ruturn" class="button px-3 rounded-lg d-inline"
+                                    onclick="javascript:window.open(origin+'/dic/'+store.get('medforest_tiku_urlParamsSetting').title.split('/')[0])"
+                                    data-toggle="tooltip" data-placement="bottom" title="返回目录"><i
+                                    class="bi bi-arrow-return-left"></i>返回目录
+                            </button>
+                        </div>
+                    </li>
+                    <li class="nav-item active functions">
+                        <div class="dropdown d-inline">
+                            <button id="readCloud" class="button px-3 rounded-lg"
+                                    onclick="javascript:window.open(origin+'/dic/题库:Records/'+store.get('medforest_user_info').id)"
+                                    data-toggle="tooltip"
+                                    data-placement="bottom" title="查看储存在云端的数据">
+                                <i class="bi bi-cloudy-fill"></i>云端做题记录
+                            </button>
+                        </div>
+                        <div class="dropdown d-inline">
+                            <button id="readLoacl" class="button px-3 rounded-lg" onclick="getLocalHistory()"
+                                    data-toggle="tooltip"
+                                    data-placement="bottom" title="读取储存在本地的数据">
+                                <i class="bi bi-bookmarks-fill"></i>本地记录
+                            </button>
+                        </div>
+                    </li>
+                    <li class="nav-item active functions">
+                        <div class="dropdown d-inline">
+                            <button id="upload" class="button px-3 rounded-lg" data-toggle="tooltip"
+                                    data-placement="bottom" title="上传本地数据(会覆盖保存云端数据)">
+                                <i class="bi bi-cloud-arrow-up"></i>上传做题记录
+                            </button>
+                        </div>
+                        <div class="dropdown d-inline">
+                            <button id="download" class="button px-3 rounded-lg"
+                                    data-toggle="tooltip"
+                                    data-placement="bottom" title="从云端下载数据(覆盖本地数据)">
+                                <i class="bi bi-cloud-arrow-down"></i>下载做题记录
+                            </button>
+                        </div>
+                        <div class="dropdown d-inline">
+                            <button id="flash" class="button px-3 rounded-lg"
+                                    data-toggle="tooltip"
+                                    data-placement="bottom" title="获取最新的题目更改">
+                                <i class="bi bi-arrow-clockwise"></i>刷新题目
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <div id="mainFunctionModule"
+         class="container-fluid p-0 flex-shrink-0 flex-grow-1 d-flex flex-column position-relative">
+        <div class="immerse_last mt-auto flex-grow-0">
+            <button id="last" class="button w-100"> 上一题</button>
+        </div>
+        <div class="immerse_progress"></div>
+        <div class="immerse_type flex-nowrap flex-row d-flex justify-content-start">
+            <div class="ml-2 flex-grow-0">
+                <a class="button button-rounded mb-2" style="width: 40px;padding: 0" role="button"
+                   id="settingBtn"
+                   onclick="" data-toggle="modal" data-target="#"
+                   aria-expanded="false">
+                    <i class="bi-gear-fill m-0"></i>
+                </a>
+            </div>
+            <div class="w-auto ml-2 flex-grow-0">
+                <button id="handIn" class="button button-rounded  mb-2" data-toggle="modal"
+                        data-target="#hand_in_success"
+                        onclick="handin()">
+                    完成题目
+                </button>
+            </div>
+            <div class="ml-2 flex-grow-0">
+                <a class="button button-rounded  mb-2" href="#jumpMenu" role="button" id="openAnswerCardBtn"
+                   onclick="currentJumpSelection()" data-toggle="collapse" data-target="#answerCard"
+                   aria-expanded="false">
+                    答题卡
+                </a>
+            </div>
+        </div>
+        <div class="answer-area">
+            <div id="answerCard" class="collapse bg-light p-3 ml-3 mr-3 rounded overflow-auto">
+                <div class="ansCardControls">
+                    <div class="btn-toolbar mb-2" role="toolbar" aria-label="Toolbar with button groups">
+                        <div class="btn-group mr-2" role="group" aria-label="First group">
+                            <button id="setRandom" class="btn btn-sm btn-outline-primary" data-toggle="modal"
+                                    data-target="#toggleRandomModal"
+                                    data-placement="bottom" title="切换随机或者顺序">
+                            </button>
+                            <button id="reset" class="btn btn-sm btn-outline-primary" data-toggle="modal"
+                                    data-target="#confirmResetModal"
+                                    data-placement="bottom" title="重置答题进度">
+                                <i class="bi bi-arrow-clockwise"></i>重新开始
+                            </button>
+                        </div>
+                        <div class="input-group">
+                            <form id="anscardFilter" class="d-flex border-secondary ml-1 bg-info bg-transparent" style=" align-items: center;">
+                                <div class="d-inline custom-control custom-switch no-wrap">
+                                    <input type="checkbox" class="custom-control-input" name="w" id="filterWrong" value="true" onclick="loadAnscardOptions()">
+                                    <label class="custom-control-label" for="filterWrong">错题</label>
+                                </div>
+                                <div class="d-inline custom-control custom-switch no-wrap ml-2">
+                                    <input type="checkbox" class="custom-control-input" id="filterFavorate" name="f" value="true" onclick="loadAnscardOptions()">
+                                    <label class="custom-control-label" for="filterFavorate">收藏</label>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <hr class="m-0">
+                <div id="jumpSelect"></div>
+            </div>
+            <div id="timuArea" class="immerse_timu">
+                <div id="subjectContainer" class="subjectContainer m-4 h2">
+                    <div class="spinner-border text-secondary" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="commentContainer"></div>
+        </div>
+    </div>
+    <div class="immerse_last mb-auto flex-grow-0 ">
+        <button id="next" class="button w-100"> 下一题</button>
+    </div>
+</div>
+<div id="messages"></div>
+</div>
+<div id="modals">
+    <!--版本升级提示-->
+    <div class="modal fade" id="updateModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="loadingLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable ">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>检测到版本更新</h5>
+                </div>
+                <div class="modal-body">
+                    <div id="1000" class="updateLog">
+                        <div class="describe">
+                            <b>本此升级 v0.4.6.0 -> v1.0.0.0</b>
+                            <p>注意！这是一次巨大的升级。从刷题工具诞生到现在，经过了数十位用户的体验，产生了上万次做题数据。在经历了半年余的优化升级后，现隆重推出刷题工具正式版<b>V1.0.0.0。</b></p>
+                            <p>请点击<b>下方</b>运行<b>升级脚本</b>进行升级，本次升级需要联网更新存档的数据结构，可能需要一定的时间，请耐心等待</p>
+                        </div>
+                        <div class="alert alert-info" role="alert">如果反复升级失败或者升级后无法正常使用请联系<a href="mailto:htl20011030@163.com">htl20011030@163.com</a>或者加入<a href="https://jq.qq.com/?_wv=1027&amp;k=SU8YAyF2">医林拾薪QQ群</a>联系群主</div>
+                        <div id="updateFeature" class="carousel slide" data-ride="carousel">
+                            <b>更新内容</b>
+                            <ol>
+                                <li>功能
+                                    <ul>
+                                        <li>新增设置功能</li>
+                                        <li>新增题目收藏功能</li>
+                                        <li>答题卡新增题目筛选功能</li>
+                                        <li>随机题目功能优化</li>
+                                    </ul>
+                                </li>
+                                <li>界面
+                                    <ul>
+                                        <li>界面自适应功能增强，字体大小更人性化</li>
+                                        <li>界面动效增强</li>
+                                        <li>界面风格统一（编辑界面，提示框等）</li>
+                                    </ul>
+                                </li>
+                                <li>代码
+                                    <ul>
+                                        <li>底层代码优化</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+                        <div id="updateStatus">
+                            <div class="progress" id="updateProgressBar">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div id="1100"  class="updateLog">
+                        <div class="describe">
+                            <b>本此升级 v1.0.0.0 -> v1.1.0.0</b>
+                            <p>1. <label class="text-danger">升级了云同步体验</label>，不再使用医林拾薪主站页面作为存档载体，改用数据库储存，请按提示用<b>医林拾薪账户登陆</b>后使用并<b>迁移数据</b></p>
+                            <p>2. 对一些小细节进行了修复：本次储存页面新增删除和加载小按钮；设置页面注销时同步刷新本页面</p>
+                        </div>
+                        <div class="alert alert-info" role="alert">如果反复升级失败或者升级后无法正常使用请联系<a href="mailto:htl20011030@163.com">htl20011030@163.com</a>或者加入<a href="https://jq.qq.com/?_wv=1027&amp;k=SU8YAyF2">医林拾薪QQ群</a>联系群主</div>
+                    </div>
+                    <div id="1110"  class="updateLog">
+                        <div class="describe">
+                            <b>本此升级 v1.1.0.0 -> v1.1.1.0</b>
+                            <p>1. <label class="text-danger">新增设置：</label>自动显示答案，请在设置中选择开启</p>
+                        </div>
+                        <div class="alert alert-info" role="alert">如果反复升级失败或者升级后无法正常使用请联系<a href="mailto:htl20011030@163.com">htl20011030@163.com</a>或者加入<a href="https://jq.qq.com/?_wv=1027&amp;k=SU8YAyF2">医林拾薪QQ群</a>联系群主</div>
+                    </div>
+                    <div id="112"  class="updateLog">
+                        <div class="describe">
+                            <b>本此升级 v1.1.1.0 -> v1.1.2</b>
+                            <p>1. <label class="text-danger">修复：</label>题目加载时不能按照医林拾薪页面的顺序的错误</p>
+                        </div>
+                        <div class="alert alert-info" role="alert">如果反复升级失败或者升级后无法正常使用请联系<a href="mailto:htl20011030@163.com">htl20011030@163.com</a>或者加入<a href="https://jq.qq.com/?_wv=1027&amp;k=SU8YAyF2">医林拾薪QQ群</a>联系群主</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="updateBtn" class="btn btn-primary">运行升级脚本</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--输入题库路径界面-->
+    <div class="modal fade" id="noTikuPath" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">未输入题库路径</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="pathInput">
+                        <div class="input-group">
+                            <label>
+                                <select class="custom-select" style="height: 37px;min-width: 114px;flex-grow: 1">
+                                    <option>题库名称</option>
+                                    <option>JSON地址</option>
+                                </select>
+                            </label>
+                            <label>
+                                <input type="text" style="flex-grow: 5" class="form-control m-0" name="path">
+                            </label>
+                        </div>
+                    </form>
+                    <div id="suggestPath"><p class="m-0">上次做到：</p></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal"
+                            onclick="javascript:window.location.href=urls.origin+'tools/tiku/index.html?title='+formToJSON('#pathInput',false,'s').path">前往</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--本地记录界面-->
+    <div class="modal fade" id="localHistory" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">本地做题记录</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="localHistoryContent" class="modal-body">
+                    暂无做题记录
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--设置界面-->
+    <div class="modal fade" id="settings" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">设置</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="settingsContent" class="modal-body">
+                    <div id="setting-basic">
+                        <div class="setting-content"><p class="settingName h5">基础设置</p></div>
+                        <div id="children-basic" class="setting-children">
+                            <div id="setting-exercise">
+                                <div class="setting-content"><p class="settingName font-weight-bold">做题设置</p></div>
+                                <div id="children-exercise" class="setting-children">
+                                    <div id="setting-autoShowAnswer">
+                                        <div class="setting-content"><p class="settingName">自动显示答案</p>
+                                            <div class="custom-control custom-switch">
+                                                <input type="hidden" name="autoShowAnswer" value="F">
+                                                <input type="checkbox" class="custom-control-input" name="autoShowAnswer" id="autoShowAnswer" value="T">
+                                                <label class="custom-control-label" for="autoShowAnswer"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="setting-autoNext">
+                                        <div class="setting-content"><p class="settingName">答对自动下一题</p>
+                                            <div class="custom-control custom-switch">
+                                                <input type="hidden" name="autoNext" value="F">
+                                                <input type="checkbox" class="custom-control-input" name="autoNext" id="autoNext" value="T">
+                                                <label class="custom-control-label" for="autoNext"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="setting-shortcut">
+                                        <div class="setting-content"><p class="settingName">启用快捷键</p>
+                                            <div class="custom-control custom-switch">
+                                                <input type="hidden" name="shortcut" value="F">
+                                                <input type="checkbox" class="custom-control-input" name="shortcut" id="shortcut" value="T">
+                                                <label class="custom-control-label" for="shortcut"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="setting-sync">
+                                <div class="setting-content"><p class="settingName font-weight-bold">同步设置</p></div>
+                                <div id="children-sync" class="setting-children">
+                                    <div id="setting-autoSync">
+                                        <div class="setting-content"><p class="settingName">自动同步</p>
+                                            <div class="custom-control custom-switch">
+                                                <input type="hidden" name="autoSync" value="F">
+                                                <input type="checkbox" class="custom-control-input" name="autoSync" id="autoSync" value="T">
+                                                <label class="custom-control-label" for="autoSync"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="setting-account">
+                                        <div class="setting-content"><p class="settingName">账号设置</p>
+                                            <div id="settingUserInfo" class="bg-light">
+                                                <div class="text-black-50"><div class="spinner-border spinner-border-sm" role="status" style=" margin-top: 5px;">
+                                                </div>获取用户信息...</div>
+                                            </div>
+                                        </div>
+                                        <div class="setting-content"><p class="settingName">同步账号设置</p>
+                                            <div id="settingSyncUserInfo" class="bg-light">
+                                                <div class="text-black-50"><div class="spinner-border spinner-border-sm" role="status" style=" margin-top: 5px;">
+                                                </div>获取用户信息...</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="setting-display">
+                                <div class="setting-content"><p class="settingName font-weight-bold">界面设置</p></div>
+                                <div id="children-display" class="setting-children">
+                                    <div id="setting-defaultOpenAnscard">
+                                        <div class="setting-content"><p class="settingName">启动时打开答题卡</p>
+                                            <div class="custom-control custom-switch">
+                                                <input type="hidden" name="defaultOpenAnscard" value="F">
+                                                <input type="checkbox" class="custom-control-input" name="defaultOpenAnscard" id="defaultOpenAnscard" value="T">
+                                                <label class="custom-control-label" for="defaultOpenAnscard"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+                <div class="modal-footer">
+                    <div id="about">
+                        <a href="javascript:void(0)" data-dismiss="modal" data-toggle="modal" data-target="#aboutModal"><span>关于</span></a>
+                    </div>
+                    <button id="applySettingsBtn" type="button" class="btn btn-info" onclick="updateSattings()">应用</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--登录界面-->
+    <div class="modal fade" id="login" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">登录</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="loginForm" class="modal-body">
+                    <div class="form-group row">
+                        <label for="inputName" class="col-sm-2 col-form-label">账号</label>
+                        <div class="col-sm-10">
+                            <input name="name" class="form-control" id="inputName">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputPassword" class="col-sm-2 col-form-label">密码</label>
+                        <div class="col-sm-10">
+                            <input name="password" type="password" class="form-control" id="inputPassword">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <a href="https://www.medforest.cn/medf/index.php?title=特殊:用户登录" class="col-sm-10 col-form-label">
+                            如需记住登录请点击此处登入
+                        </a>
+                    </div>
+                    <div id="loginResult"></div>
+                </form>
+                <div class="modal-footer">
+                    <button id="loginBtn" type="button" class="btn btn-primary" onclick="loginProcess()">登入</button>
+                    <a target="_blank"  href="https://www.medforest.cn/medf/index.php?title=%E7%89%B9%E6%AE%8A:%E5%88%9B%E5%BB%BA%E8%B4%A6%E6%88%B7&returnto=%E7%89%B9%E6%AE%8A%3AApiSandbox"
+                    class="btn btn-info">注册</a>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Sync录界面-->
+    <div class="modal fade" id="syncLogin" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">登录同步服务器（账号密码与医林拾薪相同）</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="syncLoginForm" class="modal-body">
+                    <div class="form-group row">
+                        <label for="inputName" class="col-sm-2 col-form-label">账号</label>
+                        <div class="col-sm-10">
+                            <input name="name" class="form-control" id="syncInputName">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputPassword" class="col-sm-2 col-form-label">密码</label>
+                        <div class="col-sm-10">
+                            <input name="password" type="password" class="form-control" id="syncInputPassword">
+                        </div>
+                    </div>
+                    <div id="syncLoginResult"></div>
+                </form>
+                <div class="modal-footer">
+                    <button id="syncLoginBtn" type="button" class="btn btn-primary" onclick="syncLoginProcess()">登入</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--确认编辑界面-->
+    <div class="modal fade" id="confirmEdit" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl h-100" style="min-width: 80%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">编辑预览</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="confirmEditBody" class="modal-body">
+                    <div class="confirmEditHeader"><h5>以下为修改结果 请认真耐心检查核对！以wikitext格式显示</h5><hr></div>
+                    <div class="changes d-flex flex-row h-100">
+                        <div class="before-edit change flex-grow-1"><b>编辑前：</b><br><textarea id="edit-before" class="form-control h-100"></textarea></div>
+                        <div class="after-edit change flex-grow-1"><b>编辑后：</b><br><textarea id="edit-after" class="form-control h-100"></textarea></div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary edit-submit" data-dismiss="modal">确认</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--存在为保存记录提示-->
+    <div class="modal fade" id="haveUnSavedExerciseModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="loadingLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>存在未保存的记录，是否继续答题</h5>
+                </div>
+                <div class="modal-body">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">关闭</button>
+                    <button type="button" id="continueLastBtn" class="btn btn-primary" data-dismiss="modal">继续上次答题
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--切换答题顺序提示-->
+    <div class="modal fade" id="toggleRandomModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="loadingLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>切换顺序会重置当此做题结果并且进行一次云同步，是否切换？</h5>
+                </div>
+                <div class="modal-body">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">关闭</button>
+                    <button type="button" id="confirmToggleRandom" onclick="toggleRandom()" class="btn btn-primary"
+                            data-dismiss="modal">确认切换
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--重新开始答题提示-->
+    <div class="modal fade" id="confirmResetModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="loadingLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>确认重新开始答题？</h5>
+                </div>
+                <div class="modal-body">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">关闭</button>
+                    <button type="button" id="confirmReset" class="btn btn-primary" data-dismiss="modal">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--没有下一题提示-->
+    <div class="modal fade" id="confirmHandInModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="loadingLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>没有下一题了，是否交卷并同步结果？</h5>
+                </div>
+                <div class="modal-body">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">关闭</button>
+                    <button type="button" id="confirmHandIn" class="btn btn-primary" data-dismiss="modal" onclick="handin()">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--导入到同步服务器提示-->
+    <div class="modal fade" id="mergeToSyncServerModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="loadingLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>检测到第一次运行，同步服务器无数据，请迁移数据！（不影响做题数据）</h5>
+                </div>
+                <div class="modal-body">
+                    <button type="button" onclick="toSyncServer(false)" id="mergeFromMedforest" class="btn btn-primary" data-dismiss="modal">医林拾薪->同步服务器(推荐)</button>
+                    <button type="button" onclick="toSyncServer(true)" id="mergeFromLoacl" class="btn btn-primary" data-dismiss="modal">本地->同步服务器</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--版本信息提示框-->
+    <div class="modal fade" id="aboutModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="loadingLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>关于医林拾薪刷题工具</h5>
+                </div>
+                <div class="modal-body d-flex flex-column align-items-center">
+                    <p>当前版本V1.1.2-β(origin)
+                    </p>
+                    <a href="javascript:void(0)" data-dismiss="modal" data-toggle="modal" data-target="#updateModal" onclick="checkAndShowUpdate('1.0.0.0')">重新运行1.0.0.0升级脚本</a>
+                    <p>本工具由Cirno.9个人开发</p>
+                    <p>联系方式：<a href="mailto:htl20011030@163.com">htl20011030@163.com</a></p>
+                    <img src="pics/cirno.jpg" style="width: 200px">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+<script type="text/javascript">
+    var reg = /^(192.168.1.)/;
+    if (window.location.hostname !== 'localhost' && !reg.test(window.location.hostname)) {
+        // 判断非本地server时 http强制转换成https
+        var targetProtocol = "https:";
+        if (window.location.protocol !== targetProtocol)
+            window.location.href = targetProtocol +
+                window.location.href.substring(window.location.protocol.length);
+    }
+    $('#confirmReset').bind('click', function () {
+        let storager = new Storager()
+        let display = new Display()
+        storager.reset()
+        display.innitiate()
+        showTimu()
+    })
+    $('#settingBtn').bind('click',function () {
+        let s = new Settings()
+        s.settingsInterface()
+        $('#settings').modal('show')
+    })
+
+    $('#next').bind('click', function () {
+        next()
+    })
+    $('#last').bind('click', function () {
+        last()
+    })
+    $('#upload').bind('click',function () {
+        let sync = new Sync()
+        let storager = new Storager()
+        storager.save()
+        sync.upload()
+    })
+    $('#download').bind('click',function () {
+        let sync = new Sync()
+        sync.download()
+    })
+    $('#flash').bind('click',async function () {
+        let tiku = new Tiku()
+        await tiku.innitiate(undefined,true)
+        showTimu()
+    })
+    let exercise = new Exercise()
+    exercise.innitiate()
+    // 快捷键
+    $(document).keydown(function (event) {
+        console.log(event.keyCode)
+        console.log($('.timuEditContainer').length===0)
+        console.log(gSshortcut())
+        if($('.timuEditContainer').length===0&&gSshortcut()){
+            if (event.keyCode == 32 || event.keyCode == 13) {
+                $('.showAnswer').click()
+            } else if (event.keyCode == 87 || event.keyCode == 65 || event.keyCode == 37 || event.keyCode == 38) {
+                $('#lastSmall').click()
+            } else if (event.keyCode == 68 || event.keyCode == 83 || event.keyCode == 39 || event.keyCode == 40) {
+                $('#nextSmall').click()
+            }
+        }
+    });
+    $(window).on('unload visibilitychange',async function () {
+        console.log('退出前上传')
+        // await new Sync().upload(0)
+
+        //用户的答题记录
+        var records = JSON.stringify(gRecorder())
+        var zipped = zip(records)
+        const statics = readResult(gResults())
+        fetch(urls.apiSync+'/sync/updateArchive', {
+            keepalive: true,
+            method: 'post',
+            headers: {
+                'content-type': 'application/json',
+                'Authorization': 'Bearer '+ gUInfo().syncToken
+            },
+            body: JSON.stringify({
+                token:gUInfo().syncToken,
+                'exercise_savedata':zipped,
+                title:gList().title,
+                pos:'abs:'+gProgress().absPos+'|type:'+gProgress().type+'|pos:'+gProgress().pos,
+                done:(statics.all-statics.notdone),
+                right:statics.right,
+                online:0
+            })});
+        return true
+    });
+</script>
+</html>

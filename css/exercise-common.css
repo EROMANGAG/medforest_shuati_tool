@@ -1,0 +1,330 @@
+body{
+    background-color: #e8e8e8
+}
+.no-wrap{
+    white-space:nowrap
+}
+.updateLog{
+    display: none;
+}
+#timuArea{
+    flex-grow: 1;
+    min-width: 600px;
+}
+.immerse_container{
+    background-color: #e8e8e8;
+    padding: 0;
+    height: 100%;
+}
+.immerse_last{
+    font-size: 30px;
+}
+
+.immerse_wide_100{
+    width: 100%;
+    margin: 0;
+}
+
+.immerse_data{
+    display: none;
+}
+.immerse_timu{
+    width: auto;
+    overflow: auto;
+    height: 100%;
+}
+.immerse_progress{
+    min-height: 12px;
+}
+
+.correctAnswerNoDisplay{
+    display: none;
+}
+.noDisplay{
+    display: none;
+}
+
+.no-background{
+    background-color: rgba(255, 255, 255, 0);
+    transition-duration: 1000ms;
+}
+
+.answerTip{
+    display: inline;
+    background: lightgrey;
+    color: darkgreen;
+    padding: 3px;
+    border-radius: 5px;
+    margin-left: 5px;
+    margin-bottom: 0;
+}
+.TKcheck{
+    width:fit-content;
+    padding: 0px 10px 0px 10px;
+    display: inline;
+    margin-left: 3px;
+    border-radius: 5px;
+}
+.immerse_settings>.button{
+    margin-top: 5px;
+    margin-left: 14px;
+}
+.immerse_type>.button{
+    margin-top: 5px;
+    margin-left: 14px;
+}
+
+::-webkit-scrollbar{
+    display:none;
+}
+
+#current_progress{
+    font-size: 18px;
+    color: #0e1aff;
+    background-color: #1B9AF7;
+    z-index: 9999;
+    border-radius: 2px;
+    margin: 3px;
+    padding: 3px;
+    position: absolute;
+}
+
+.message-mobile{
+    margin-top: 0;
+    text-align: center;
+    vertical-align:middle;
+    padding: 10px;
+    border-radius: 8px;
+    display: none;
+}
+.messages-mobile{
+    width: 100%;
+    left: 0;
+    top: 0;
+}
+
+#messages{
+    position: fixed;
+    min-width: 350px;
+    top: 80px;
+    right: 7px;
+}
+
+.functions{
+    margin-top: 3px;
+    margin-left: 13px;
+}
+.functions>button{
+    min-width: 100px;
+    margin-top: 3px;
+}
+i{
+    margin-right: 3px;
+}
+#collapseOne{
+    max-height: 350px;
+    overflow: scroll;
+}
+#navbarText{
+    position: relative;
+}
+#navbarText:before{
+    content: '';
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background: url(http://dav.medforest.cn/tools/tiku/MedForestLogo-Spring167.png) no-repeat 100%,50%;
+    background-size: auto 51px;
+    filter: drop-shadow(4px 10px 8px gray) opacity(0.06);
+}
+
+@media screen and (max-width: 1200px) {
+    #navbarText:before{
+        background-size: auto auto;
+        background: url(http://dav.medforest.cn/tools/tiku/MedForestLogo-Spring167.png) no-repeat 90%,50%;
+    }
+}
+.loading{
+    top: 50%;
+    left: 50%;
+    transform:translate(-50%,-50%);
+}
+.answer-area{
+    flex-grow: 1;
+    overflow: auto;
+    display: flex;
+    flex-direction: row-reverse;
+    height: 1px;
+}
+#answerCard{
+    flex-grow: 0;
+    max-width:450px;
+    min-width: 400px;
+    transition-duration: 300ms;
+}
+.ansCardControls{
+    word-wrap:break-word;
+    word-break:normal;
+}
+.anscard-type{
+    position: absolute;
+    font-size: 10px;
+    top: 80%;
+    left: 50%;
+    transform:translate(-50%,-50%);
+    color: #b9b9b9;
+}
+#suggestPath{
+    margin-left: 10px;
+    margin-top: 5px;
+}
+@media screen and (max-width: 1300px) {
+    #answerCard{
+        max-width: 370px;
+        min-width: 370px;
+        transition-duration: 300ms;
+    }
+}
+@media screen and (max-width: 1120px) {
+    #answerCard{
+        width: auto;
+        flex-grow: 1;
+        min-width: 250px;
+        max-width:100%;
+        transition-duration: 300ms;
+    }
+    #timuArea{
+        min-width: auto;
+    }
+    .answer-area{
+        flex-direction: column;
+    }
+}
+@media screen and (max-width: 850px){
+    #messages{
+        z-index: 5;
+        right: auto;
+        left:5px;
+        bottom: 80px;
+        min-width: 100%;
+        top: auto;
+    }
+    .button{
+        padding-left: 25px;
+        padding-right: 25px;
+    }
+    .options>label{
+        font-size: 24px;
+        transition-duration: 300ms;
+    }
+    .info{
+        font-size: 20px;
+        transition-duration: 300ms;
+    }
+    .titleBC{
+        font-size: 22px;
+        transition-duration: 300ms;
+    }
+    .bcOptions{
+        font-size: 20px;
+        transition-duration: 300ms;
+    }
+    .subjectContainer{
+        font-size: 27px;
+        transition-duration: 300ms;
+    }
+    .ansContainer{
+        font-size: 27px;
+        transition-duration: 300ms;
+    }
+    input[type=checkbox], input[type=radio]{
+        height: 16px;
+        transition-duration: 300ms;
+    }
+}
+@media screen and (max-width: 550px){
+    #messages{
+        z-index: 5;
+        right: auto;
+        left:5px;
+        bottom: 80px;
+        min-width: 100%;
+        top: auto;
+        transition-duration: 300ms;
+    }
+    #last{
+        display: none;
+    }
+    #next{
+        display: none;
+    }
+    .button{
+        padding-left: 25px;
+        padding-right: 25px;
+    }
+    .subTitle{
+        margin-top: 3px;
+        margin-bottom: 2px;
+        transition-duration: 200ms;
+    }
+    .options{
+        margin: 1px;
+        transition-duration: 200ms;
+    }
+    .options>label{
+        font-size: 18px;
+        max-width: 100%;
+        transition-duration: 200ms;
+    }
+    .info{
+        font-size: 16px;
+        transition-duration: 300ms;
+    }
+    .titleBC{
+        font-size: 17px;
+        transition-duration: 300ms;
+    }
+    .bcOptions{
+        font-size: 15px;
+        transition-duration: 300ms;
+    }
+    .subjectContainer{
+        font-size: 22px;
+        transition-duration: 300ms;
+    }
+    .ansContainer{
+        font-size: 22px;
+        transition-duration: 300ms;
+    }
+    input[type=checkbox], input[type=radio]{
+        height: 14px;
+        transition-duration: 300ms;
+    }
+}
+@media screen and (max-width: 400px){
+    .button{
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
+
+@media (max-width: 500px) {
+    .confirmEditContainer {
+        width: 95%;
+        position: absolute;
+    }
+
+    .change-to {
+        display: none;
+    }
+    .option-input{
+        width: 100%;
+    }
+}
+
+@media (max-height: 300px) {
+    .confirmEditContainer {
+        top: 20px;
+    }
+}
+

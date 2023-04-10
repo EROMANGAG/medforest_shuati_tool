@@ -1,0 +1,13 @@
+
+.setting-children{
+    margin-left: 25px;
+}
+.setting-content{
+    display: flex;
+    flex-direction: row;
+}
+.settingName{
+    display: inline;
+    margin-right: 5px;
+    margin-bottom: 0;
+}

@@ -1,0 +1,112 @@
+.subject{
+    margin-top: 10px;
+    max-width: 95%;
+    word-wrap:break-word
+}
+.explain{
+    display:inline;
+    white-space: pre-line;
+}
+.type{
+    display: inline;
+    background: #e3e3e3;
+    padding: 2px 2px 2px 2px;
+    border-radius: 10px 0 0 10px;
+    color: #6d6d6d;
+    margin-bottom: 0;
+}
+.source{
+    display: inline;
+    background: #f1f1f1;
+    padding: 2px 2px 2px 2px;
+    border-radius: 0 10px 10px 0;
+    color: #6d6d6d;
+    margin-right: 3px;
+    margin-bottom: 0;
+}
+.title{
+    display: inline;
+    margin-left: 5px;
+    white-space: pre-line;
+}
+.subTitle{
+    display: flex;
+    align-items: flex-start;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    transition-duration: 300ms;
+}
+.titleBC{
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+    font-size: 28px;
+}
+.info{
+    font-size: 22px;
+    border-radius: 5px;
+    padding: 4px;
+    background-color: #ededed;
+    transition-duration: 300ms;
+}
+.options{
+    display: block;
+    margin-left: 20px;
+    margin-top: 15px;
+}
+.options>.row{
+    margin-bottom: 6px;
+}
+.bcOptions{
+    border-radius: 5px;
+    padding: 4px;
+    background-color: #ededed;
+    transition-duration: 300ms;
+    font-size: 27px;
+}
+.ansContainer{
+    margin-top: 15px;
+    margin-left: 20px;
+}
+.correctAnswer{
+    display: inline;
+}
+.options>label{
+    display: block;
+    word-wrap:break-word;
+    max-width: 98%;
+    margin-top: 5px;
+    border-radius: 5px;
+    font-size: 28px;
+    transition-duration: 300ms;
+}
+.correct{
+    transition-duration: 300ms;
+    background-color: rgba(53, 238, 40,0.4);
+    font-weight: bold;
+}
+.wrong{
+    transition-duration: 300ms;
+    background-color: rgba(255, 79, 79, 0.4);
+    font-weight: bold;
+}
+.notChoose{
+    transition-duration: 300ms;
+    background-color: rgb(255, 228, 141);
+    font-weight: bold;
+}
+.typePD>.subject>.options{
+    columns:2 30px;
+    list-style-type:none;
+}
+
+
+.subjectContainer{
+    transition-duration: 300ms;
+}
+input[type=checkbox], input[type=radio]{
+    height: 18px;
+    width: 20px;
+    transition-duration: 300ms;
+}
