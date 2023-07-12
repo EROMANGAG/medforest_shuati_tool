@@ -20,7 +20,7 @@
     <!--  系统脚本需最早加载  -->
     <script src="../config.js"></script>
 
-    <script src="./js/exercise-common.js?ver=1.1.2"></script>
+    <script src="./js/exercise-common.js?ver=1.1.3"></script>
     <script src="./js/exercise-log.js?ver=1.1.2"></script>
     <script src="./js/exercise-settings.js?ver=1.1.2"></script>
     <script src="./js/exercise-store.js?ver=1.1.2"></script>
@@ -29,7 +29,7 @@
     <script src="./js/exercise-config.js?ver=1.1.2"></script>
     <script src="./js/exercise-sync.js?ver=1.1.2"></script>
     <script src="./js/exercise-tiku.js?ver=1.1.2"></script>
-    <script src="./js/exercise-display.js?ver=1.1.2"></script>
+    <script src="./js/exercise-display.js?ver=1.1.3"></script>
     <script src="./js/exercise-main.js?ver=1.1.2"></script>
     <script src="./js/exercise-edit.js?ver=1.1.2"></script>
     <script src="./js/exercise-update.js?ver=1.1.2"></script>
@@ -429,6 +429,11 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div id="setting-forceReload">
+                                        <div class="setting-content"><p class="settingName">界面加载不正确尝试强制刷新</p>
+                                            <button type="button" class="btn btn-primary btn-sm" onclick="javascript:location.reload(true);">强制刷新</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -485,7 +490,7 @@
             </div>
         </div>
     </div>
-    <!--Sync录界面-->
+    <!--Sync登录界面-->
     <div class="modal fade" id="syncLogin" data-backdrop="static" data-keyboard="false" tabindex="-1"
          aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -539,6 +544,35 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary edit-submit" data-dismiss="modal">确认</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--本地数据结构检查界面-->
+    <div class="modal fade" id="localIntegralityVerify" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">本地数据结构检查</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div  class="modal-body">
+                    <div id="localIntegralityVerifyStatics">
+                        <p>已完成验证：<label id="verifiedDone">0</label></p>
+                        <p class="text-danger">缺失：<label id="verifiedMiss">0</label></p>
+                        <p class="text-danger">不正确：<label id="verifiedIncorrect">0</label></p>
+                        <p class="">耗时：<label id="verifiedTime"></label></p>
+                    </div>
+                    <div id="localIntegralityVerifyResult">
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
                 </div>
             </div>
@@ -617,6 +651,7 @@
                     <h5>检测到第一次运行，同步服务器无数据，请迁移数据！（不影响做题数据）</h5>
                 </div>
                 <div class="modal-body">
+                    <button type="button" onclick="createArchiveBtn(false)" id="createArchiveBtn" class="btn btn-primary mb-1" data-dismiss="modal">第一次使用点此创建云存档</button><br>
                     <button type="button" onclick="toSyncServer(false)" id="mergeFromMedforest" class="btn btn-primary" data-dismiss="modal">医林拾薪->同步服务器(推荐)</button>
                     <button type="button" onclick="toSyncServer(true)" id="mergeFromLoacl" class="btn btn-primary" data-dismiss="modal">本地->同步服务器</button>
                 </div>
@@ -712,7 +747,14 @@
     $(window).on('unload visibilitychange',async function () {
         console.log('退出前上传')
         // await new Sync().upload(0)
-
+        if (gUInfo().id === 0) {
+            console.log('无身份')
+            return false
+        }
+        if(isEmptyObject(records)){
+            console.log('上传数据为空')
+            return false
+        }
         //用户的答题记录
         var records = JSON.stringify(gRecorder())
         var zipped = zip(records)

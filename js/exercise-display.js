@@ -250,6 +250,12 @@ function newTimu(id,json,editButton, hideButton,addHr,parent=''){
     hideButton = hideButton !== undefined ? hideButton : false
     let type = json.type
     let o = {}
+
+    //将choice 统一为Array的转换
+    if(typeOfObj(json.choices)==='[object Array]'&&json.choices.length===1&&type!=='A3'){
+        json.choices = json.choices[0]
+    }
+
     o.temp = {
         main:$('<div id="'+id+'" class="type'+type+' timu"></div>'),
         subject:$('<div class="subject"></div>'),

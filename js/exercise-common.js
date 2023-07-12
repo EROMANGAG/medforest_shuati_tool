@@ -66,6 +66,18 @@ function isInDic(dic,val) {
     }
     return false
 }
+
+function typeOfObj(object){
+    return Object.prototype.toString.call(object);
+}
+
+//字典是否为空
+function isEmptyObject(obj) {
+    for (var key in obj) {
+        return false;
+    }
+    return true;
+}
 //将字典的值转换为列表
 function dicItemsToList(obj){
     var result = []

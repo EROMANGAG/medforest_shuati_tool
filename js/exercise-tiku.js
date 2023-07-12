@@ -62,7 +62,11 @@ async function loadFromWeb({title=undefined,revid=undefined}={}) {
     })
     r.result = JSON.parse(dataStructure.typesDic)
     let parsedData = results.result.parse
-    results.result = $(results.result.parse.text["*"]).children('.data').each(
+    let parsedObj = $(results.result.parse.text["*"])
+    if (isParserMobileFormat(parsedObj)){
+        parsedObj = extractContentInMobileFormat(parsedObj)
+    }
+    parsedObj.children('.data').each(
         function (index,ele) {
             //将题目中的HTML节点转换为文本
             let singleData = $(ele).html()
@@ -90,7 +94,20 @@ async function loadFromWeb({title=undefined,revid=undefined}={}) {
         ,content: r.result})
     return r
 }
-
+//修正函数：用于判断是否为手机版输出
+function isParserMobileFormat(obj) {
+    return obj.children('.mf-section-0').length > 0
+}
+//修正函数：当运行为手机版时，从section中提取题目内容
+function extractContentInMobileFormat(obj) {
+    let result = $('<div></div>')
+    obj.children('section').each(
+        function (index,ele) {
+            result.append($(ele).html())
+        }
+    )
+    return result
+}
 async function loadFromJSON(f) {
     let log = new Logger()
     let api = new Api()

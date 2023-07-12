@@ -11,8 +11,9 @@ function Storager() {
         sList({})
         sNewList({})
         sResults({})
+        cleanNullInRecord()
         let recorder = gRecorder()
-        if((recorder !== undefined)&&gUInfo().id!==0){
+        if((recorder !== undefined)&&gUInfo().id!==0&&recorder!=={}){
             recorder.counter += 1
         }else {
             recorder = {counter:0,archive:{},settings:{}}
@@ -32,6 +33,8 @@ function Storager() {
         console.info(`>>Storager.load(${id})`,gInfo())
     }
     Storager.prototype.save = function () {
+        //验证数据完整性
+        // verifyIntegrality(false)
         let recorder = gRecorder()
         let r = {
             time:Date.now(),
@@ -289,10 +292,91 @@ function delThisHistory(id) {
     sRecorder(r)
     sync.upload()
 }
+//专门用来清理counter=null的情况
+function cleanNullInRecord(){
+    let record = gRecorder()
+    if(gRecorder().counter===null){
+        if(gRecorder().archive !== {}){
+            //排序获得最大值
+            let maxKey = 0
+            for(let i in record.archive){
+                maxKey = i*1>maxKey ? i*1:maxKey
+            }
+            record.counter = maxKey
+            console.log(maxKey)
+            sRecorder(record)
+        }else {
+            sRecorder({counter:0,archive:{},settings:{}})
+        }
+    }
+}
+function verifyIntegrality(modal = true) {
+    let modalContent = $('#localIntegralityVerifyResult')
+    let start = Date.now()
+    modalContent.html('')
+    $('#verifiedDone').text(0)
+    $('#verifiedMiss').text(0)
+    $('#verifiedIncorrect').text(0)
+    let wrong = 0
+
+    if(modal){
+        $('#localIntegralityVerify').modal('show')
+    }
+
+    let verify = function (checkObj,standardObj, key, parentID = 'localIntegralityVerifyResult') {
+        var parent = $('#'+parentID)
+        $('#verifiedDone').text($('#verifiedDone').text()*1 + 1)
+        console.log(checkObj)
+        // console.log(key)
+        console.log(typeof(checkObj))
+        // console.log(standardObj)
+        console.log(parentID)
+        console.log()
+        let status = typeof(checkObj)===standardObj.type
+
+        let target = parentID+'-'+key
+        if( parent.children('.localIntegralityVerifyChildren').length>0){
+            parent.children('.localIntegralityVerifyChildren').append('<div id="'+target+'" style="display:none"></div>')
+        }else {
+            parent.append('<div id="'+target+'"></div>')
+        }
+        if(status){
+            $('#'+target).append('<div><p class="text-success">数据名：'+key+' 的类型为 '+typeof(checkObj)+' 符合默认设置</p></div><div class="localIntegralityVerifyChildren"></div>')
+            let i = 0
+            for (let childrenKey in standardObj.children){
+                console.log(childrenKey)
+                verify(checkObj[childrenKey],standardObj.children[childrenKey], childrenKey,target)
+                i += 1
+            }
+        }else {
+            wrong += 1
+            $('#'+target).append('<div><p class="text-danger">数据名：'+key+' 的类型为 '+typeof(checkObj)+' 不符合默认设置，值：'+checkObj+'</p></div><div class="localIntegralityVerifyChildren"></div>')
+            if(typeof(checkObj)==='undefined'){
+                $('#verifiedMiss').text( $('#verifiedMiss').text()*1 + 1)
+            }else {
+                $('#verifiedIncorrect').text( $('#verifiedIncorrect').text()*1 + 1)
+            }
+
+        }
+        $('#'+target).fadeIn(150)
+        return status
+    }
+    let i  = 0
+    for(let key in dataType){
+        console.log(key)
+        verify(store.get(key), dataType[key], key)
+        i += 1
+    }
+    $('#verifiedTime').text(Date.now()-start+'ms')
+    return wrong === 0
+}
+
 function gRecorder() {
+    console.log(store.get('medforest_tiku_recorder'))
     return store.get('medforest_tiku_recorder')
 }
 function sRecorder(content) {
+    console.log('sRecorder',content)
     store.set('medforest_tiku_recorder',content)
 }
 function gInfo() {

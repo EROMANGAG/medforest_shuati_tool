@@ -7,9 +7,10 @@ function Exercise() {
     let settings = new Settings()
     let display = new Display()
     Exercise.prototype.innitiate = async function () {
+        //1. 检查更新 -> 2. 获取url中的题库名称 -> 3. 同步初始化，获取用户信息
         if(checkAndShowUpdate()){return false}
-        await settings.urlparams()
-        await sync.innitiate()
+        await settings.urlparams() // 获取url 参数并且储存
+        await sync.innitiate() //初始化 medforest_user_info 的本地储存
         await sync.download()
         storager.innitiate()
         settings.innitiate()
@@ -117,13 +118,15 @@ async function showAns(id,type,key) {
             let parentid = id[0].split('-')[0]
             let isRight = true
             let userchoices = []
-            console.log(id)
             for(let i=0;i<id.length;i++){
                 console.log(id[i])
                 let r = operate.A(true,id[i],key[i])
+                //A3需要显示所有的解释
+                $('#'+id[i]).children('.ansContainer').fadeIn(200)
                 console.log(r)
-                userchoices.push(r[1])
-                if(!r[0]){
+                userchoices.push(r[2][0])
+                console.log(userchoices)
+                if(!r[1]){
                     isRight = false
                 }
             }
@@ -172,8 +175,11 @@ async function showAns(id,type,key) {
             return updateResults(id,isRight,userchoices)
         },
         PD:function () {
+            key = key === 'F' ? '错误':'正确'
             let userchoices = $('input[name="option-'+id+'"]:checked').val();
+            console.log(userchoices)
             let cOpt = options.children('.'+key)
+            console.log(key)
             let uOpt = options.children('.'+userchoices)
             let isRight = true
             right(cOpt)

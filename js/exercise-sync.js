@@ -1,12 +1,12 @@
 function Sync() {
     let log = new Logger()
     Sync.prototype.innitiate = async function () {
-        let haveSyncInfo = getSyncUserInfo()
+        let haveSyncInfo = getSyncUserInfo() //检查云同步的用户信息是否存在
         console.log(haveSyncInfo)
-        let [token,userInfo] =await Promise.all([getToken(),getUserInfo()])
-        if(token.status&&userInfo.status){
+        let [token,userInfo] =await Promise.all([getToken(),getUserInfo()]) //获取医林拾薪的token和用户数据
+        if(token.status&&userInfo.status){ //如果医林拾薪token和用户信息获取成功
             console.info('>>Sync.innitiate()',token,userInfo)
-            if(!haveSyncInfo){
+            if(!haveSyncInfo){//则判断云同步信息是否存在，如果不存在，则设置syncToken为0
                 sUInfo({
                     id:userInfo.result.id
                     ,name:userInfo.result.name
@@ -50,9 +50,11 @@ function Sync() {
             log.sync_upload_c(editResult.result)
         }
         syncUploadInfoOff()
+        location.reload(true)
     }
     Sync.prototype.download =async function () {
         let hasSyncUserInfo =getSyncUserInfo()
+        console.log(gUInfo())
         //按设置判断是否继续同步
         if((hasSyncUserInfo===false || hasSyncUserInfo==='expired')&&gUInfo().id!==0){
             log.syncserver_info_e()
@@ -60,30 +62,34 @@ function Sync() {
         }else if(gUInfo().id===0){
             log.sync_no_login_w()
         }
-        //获取同步页面
-        // var page =await getLatestPageRevision('题库:records/' + id)
-        var page =await downloadArchive(gUInfo().syncToken)
-        if(page.status){
-            page = page.result
+        //获取同步页面，使用的是后端的/sync/getArchive api
+        // var returnSaveData =await getLatestPageRevision('题库:records/' + id)
+        var returnSaveData =await downloadArchive(gUInfo().syncToken)
+        console.log(returnSaveData)
+        if(returnSaveData.status){
+            //如返回成功，则等于result
+            returnSaveData = returnSaveData.result
         }else{
-            if(page.result !== 'networkError'){
+            //如果不是网络错误，说明没有云端数据，显示生成云端数据接口
+            if(returnSaveData.result !== 'networkError'){
                 $('#mergeToSyncServerModal').modal('show')
             }else {
                 log.sync_download_network_e()
             }
         }
-        //如果不存在或者无内容
-        if (page!==false&&page.length>0) {
-            page = unzip(page)
+        //如果存在或者含有内容则转换为JSON格式
+        if (returnSaveData!==false&&returnSaveData.length>0) {
+            returnSaveData = unzip(returnSaveData)
             try {
-                var pJSON = JSON.parse(page)
+                var parsedSaveData = JSON.parse(returnSaveData)
             } catch (e) {
                 log.sync_download_record_parse_e(e)
                 return false
             }
-            sRecorder(pJSON)
+            console.log(parsedSaveData)
+            sRecorder(parsedSaveData)
             log.sync_download_s()
-            console.info('>>Sync.prototype.download()',pJSON)
+            console.info('>>Sync.prototype.download()',parsedSaveData)
             // if (load&&confirm('已下载数据,是否继续作答?')) loadLatest()
         } else {
             log.sync_download_c()
@@ -97,8 +103,11 @@ function Sync() {
             log.sync_no_login_w()
             return false
         }
+
         //用户的答题记录
         var records = JSON.stringify(gRecorder())
+        console.log(isEmptyObject(records))
+
         var zipped = zip(records)
         console.log('===上传答题数据===')
         var compressRate = (getStrLength(zipped) / getStrLength(records) * 100).toFixed(2) + '%'
@@ -113,7 +122,8 @@ function Sync() {
     }
 }
 async function syncLoginProcess() {
-    let data = formToJSON('#syncLoginForm',false,'s')
+    let data = formToJSON('#syncLoginForm',true,'s')
+    console.log(data)
     let btn = $('#syncLoginBtn')
     btn.attr('disabled','disabled')
     btn.html(' <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>登入中...')
@@ -135,7 +145,8 @@ async function syncLoginProcess() {
     }
 }
 async function loginProcess() {
-    let data = formToJSON('#loginForm',false,'s')
+    let data = formToJSON('#loginForm',true,'s')
+    console.log(data)
     let btn = $('#loginBtn')
     btn.attr('disabled','disabled')
     btn.html(' <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>登入中...')
@@ -214,7 +225,24 @@ function zip(str) {
     return btoa(binaryString);
 }
 
-
+//创建云存档
+async function createArchiveBtn() {
+    let sync = new Sync()
+    sRecorder({
+        counter:0,
+        settings:{},
+        archive:{
+            0:{
+                time:Date.now(),
+                info: {},
+                progress:{},
+                results:{},
+                list:{}
+            }
+        }
+    })
+    sync.createArchive()
+}
 //向云同步服务器迁移
 async function toSyncServer(local) {
     let synced = false
@@ -222,14 +250,8 @@ async function toSyncServer(local) {
         synced = await downloadFromMedforest()
     }
     if(!synced){
-        if(confirm('未发现云端数据，如果你不是第一次使用，请点取消后重试,如果你是第一次使用，请点击确认')){
-            await new Sync().createArchive()
-        }
-    }else {
-        await new Sync().createArchive()
+        confirm('未发现云端数据，如果你不是第一次使用，请点取消后重试,如果你是第一次使用，请取消后选择第一次使用选项')
     }
-
-
 }
 //老的云同步下载
 async function downloadFromMedforest() {

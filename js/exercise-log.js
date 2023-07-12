@@ -98,7 +98,7 @@ function Logger() {
             level:'warn',
             title:'未登录状态警告！',
             subTitle:formatedTime,
-            content:'<b>警告，云同步功能需要登陆后才能使用，未登录状态下只能预览题目，但不能做题！！</b>' +
+            content:'<b>警告，本工具需要登陆后才能使用，未登录状态下只能预览题目，但不能做题！！</b>' +
                 '<a href="javasvript:viod(0)" data-toggle="modal" data-target="#login">>>点击注册或登录<<</a>',
             icon:icon.download,
             clickToClose:false

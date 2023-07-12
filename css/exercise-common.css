@@ -178,6 +178,15 @@ i{
     margin-left: 10px;
     margin-top: 5px;
 }
+#localIntegralityVerifyResult{
+    max-height: 300px;
+    overflow: scroll;
+}
+.localIntegralityVerifyChildren{
+    margin-left: 15px;
+    padding-left: 15px;
+    border-left: 1px solid #dadada;
+}
 @media screen and (max-width: 1300px) {
     #answerCard{
         max-width: 370px;

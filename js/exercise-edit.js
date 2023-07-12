@@ -1,5 +1,9 @@
 function newInlineEditor(id, json, hideButton, addHr, parent) {
     parent = parent !== undefined ? parent : ''
+    //将choice 统一为Array的转换
+    if(typeOfObj(json.choices)==='[object Array]'&&json.choices.length===1&&type!=='A3'){
+        json.choices = json.choices[0]
+    }
     if (addHr === undefined) {
         addHr = true
     }
