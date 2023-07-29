@@ -1,34 +1,41 @@
 function Sync() {
     let log = new Logger()
-    Sync.prototype.innitiate = async function () {
-        let haveSyncInfo = getSyncUserInfo() //检查云同步的用户信息是否存在
-        console.log(haveSyncInfo)
+    Sync.prototype.updateInfo = async function(){
+        let result = {id:0,name:'0',token:'0'}
         let [token,userInfo] =await Promise.all([getToken(),getUserInfo()]) //获取医林拾薪的token和用户数据
         if(token.status&&userInfo.status){ //如果医林拾薪token和用户信息获取成功
-            console.info('>>Sync.innitiate()',token,userInfo)
-            if(!haveSyncInfo){//则判断云同步信息是否存在，如果不存在，则设置syncToken为0
-                sUInfo({
-                    id:userInfo.result.id
-                    ,name:userInfo.result.name
-                    ,token:token.result
-                    ,login:userInfo.result.id !== 0
-                    ,syncToken:'0'
-                    ,syncTokenExpiredTime:0
-                })
-            }else {
-                sUInfo({
-                    id:userInfo.result.id
-                    ,name:userInfo.result.name
-                    ,token:token.result
-                    ,login:userInfo.result.id !== 0
-                    ,syncToken:gUInfo().syncToken
-                    ,syncTokenExpiredTime:gUInfo().syncTokenExpiredTime})
-            }
-        }else {
-            console.error('>>Sync.innitiate()',token,userInfo)
-            sUInfo({id:0,name:0,token:0,login:false})
-            log.sync_inni_e(token.status,userInfo.status)
+            result.token = token.result
+            result.id = userInfo.result.id
+            result.name = userInfo.result.name
         }
+        return result
+    }
+    Sync.prototype.ifNotLogin = async function(medforestToken, medforestUserId, syncLogin, syncExpired){
+        var result = true
+        if(medforestUserId === 0 || syncLogin || syncExpired){
+            result = false
+            log.sync_inni_e(
+                medforestToken ==='0' ?'获取失败':medforestToken,
+                medforestUserId === 0 ? '用户ID为0，未登录或获取失败':medforestUserId,
+                !syncLogin ? '未登录同步服务器或失败': !syncExpired?'云同步token过期':'获取成功'
+            )
+        }
+        return result
+    }
+    Sync.prototype.innitiate = async function () {
+        let syncUserInfo = getSyncUserInfo() //检查云同步的用户信息是否存在
+        let userInfo = await Sync.prototype.updateInfo()
+        console.log(syncUserInfo,userInfo)
+        sUInfo({
+            id:userInfo.id
+            ,name:userInfo.name
+            ,token:userInfo.token
+            ,login:userInfo.id !== 0
+            ,syncToken: userInfo.id===0 || syncUserInfo.notLogin || syncUserInfo.expired ? '':syncUserInfo.token
+            ,syncTokenExpiredTime: userInfo.id===0 || syncUserInfo.notLogin || syncUserInfo.expired ? 0:syncUserInfo.time
+            }
+        )
+        Sync.prototype.ifNotLogin(userInfo.token,userInfo.id,syncUserInfo.notLogin,syncUserInfo.expired)
     }
     Sync.prototype.createArchive = async function(){
         var log = new Logger()
@@ -52,16 +59,8 @@ function Sync() {
         syncUploadInfoOff()
         location.reload(true)
     }
+    //download函数下载的同时检测有没有云同步数据
     Sync.prototype.download =async function () {
-        let hasSyncUserInfo =getSyncUserInfo()
-        console.log(gUInfo())
-        //按设置判断是否继续同步
-        if((hasSyncUserInfo===false || hasSyncUserInfo==='expired')&&gUInfo().id!==0){
-            log.syncserver_info_e()
-            return false
-        }else if(gUInfo().id===0){
-            log.sync_no_login_w()
-        }
         //获取同步页面，使用的是后端的/sync/getArchive api
         // var returnSaveData =await getLatestPageRevision('题库:records/' + id)
         var returnSaveData =await downloadArchive(gUInfo().syncToken)
@@ -86,11 +85,9 @@ function Sync() {
                 log.sync_download_record_parse_e(e)
                 return false
             }
-            console.log(parsedSaveData)
             sRecorder(parsedSaveData)
             log.sync_download_s()
             console.info('>>Sync.prototype.download()',parsedSaveData)
-            // if (load&&confirm('已下载数据,是否继续作答?')) loadLatest()
         } else {
             log.sync_download_c()
             console.warn('>>Sync.prototype.download()','失败')

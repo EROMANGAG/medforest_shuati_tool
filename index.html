@@ -686,7 +686,8 @@
 </body>
 <script type="text/javascript">
     var reg = /^(192.168.1.)/;
-    if (window.location.hostname !== 'localhost' && !reg.test(window.location.hostname)) {
+    var dav = /dav.medforest.cn/g
+    if (window.location.hostname !== 'localhost' && !reg.test(window.location.hostname) && !dav.test(window.location.hostname)) {
         // 判断非本地server时 http强制转换成https
         var targetProtocol = "https:";
         if (window.location.protocol !== targetProtocol)

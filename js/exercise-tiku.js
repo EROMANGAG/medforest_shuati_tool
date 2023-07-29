@@ -70,12 +70,18 @@ async function loadFromWeb({title=undefined,revid=undefined}={}) {
         function (index,ele) {
             //将题目中的HTML节点转换为文本
             let singleData = $(ele).html()
+            console.log(singleData)
             if ($(this).children().length > 0) {
                 $(this).children().each(
                     function (n, v) {
                         var innerHTML = entityToString(v)
                         var escape = ''
                         escape = innerHTML.replace(/"/g, '\\"')
+                        //修正：如果有math则提示不可显示
+                        var mathReg = new RegExp('\[math\]','g')
+                        if(mathReg.test(innerHTML)){
+                            escape = '<b>暂不支持显示公式</b>'
+                        }
                         singleData = singleData.replace(innerHTML, escape)
                     }
                 )

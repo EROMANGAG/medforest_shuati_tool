@@ -89,14 +89,15 @@ function Settings() {
                 ,syncAccount:function () {
                     let userInfo = gUInfo()
                     let haveSyncInfo = getSyncUserInfo()
-                    if(haveSyncInfo===false){
+                    console.log(haveSyncInfo)
+                    if(haveSyncInfo.notLogin){
                         $('#settingSyncUserInfo').html('未登陆')
-                    }else if(haveSyncInfo==='expired'){
+                    }else if(haveSyncInfo.expired){
                         $('#settingSyncUserInfo').html('已过期')
                     }else {
-                        $('#settingSyncUserInfo').html(haveSyncInfo.token.substr(0,5)+'...('+secondsToFormated(haveSyncInfo.time)+' 后过期)')
+                        $('#settingSyncUserInfo').html(haveSyncInfo.token.substr(0,5)+'...('+secondsToFormated((haveSyncInfo.time-Date.now())/1000)+' 后过期)')
                     }
-                    if(haveSyncInfo === 'expired'&&gUInfo().id!==0){
+                    if(haveSyncInfo.expired&&gUInfo().id!==0){
                         $('#settingSyncUserInfo').append(' <a href="javascript:void(0);" data-dismiss="modal" data-toggle="modal" ' +
                             'data-target="#syncLogin">重新登录</a>')
                     }

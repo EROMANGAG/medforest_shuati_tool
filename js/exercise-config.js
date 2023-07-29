@@ -52,8 +52,8 @@ dataStructure = {
     'medforest_tiku_list':{},//用于保存当前的题目信息
     'medforest_tiku_list_new':{},//用于保存打开新页面时下载的题目信息
     'medforest_tiku_results':{},//用于保存做题的结果
-    typesDic: '{"A":[],"A2":[],"A3":[],"B":[],"C":[],"X":[],"PD":[],"TK":[],"MJ":[],"JD":[]}',
-    typesList: ['A', 'A2', 'A3', 'B', 'C', 'X', 'PD', 'TK', 'MJ', 'JD'],
+    typesDic: '{"A":[],"A2":[],"A3":[],"B":[],"C":[],"X":[],"PD":[],"TK":[],"MJ":[],"JD":[],"WD":[]}',
+    typesList: ['A', 'A2', 'A3', 'B', 'C', 'X', 'PD', 'TK', 'MJ', 'JD','WD'],
 }
 
 dataType = {
@@ -72,6 +72,7 @@ dataType = {
                 ,TK:{type:'number',children:{}}
                 ,MJ:{type:'number',children:{}}
                 ,JD:{type:'number',children:{}}
+                ,WD:{type:'number',children:{}}
                 }}
             ,total:{type:'number',children:{}}
             ,order:{type:'object',children:{}}
@@ -98,6 +99,7 @@ dataType = {
                 ,TK:{type:'object',children:{}}
                 ,MJ:{type:'object',children:{}}
                 ,JD:{type:'object',children:{}}
+                ,WD:{type:'object',children:{}}
                 }
             }
         }
@@ -120,6 +122,7 @@ dataType = {
                     ,TK:{type:'object',children:{}}
                     ,MJ:{type:'object',children:{}}
                     ,JD:{type:'object',children:{}}
+                    ,WD:{type:'object',children:{}}
                 }
             }
         }
@@ -163,6 +166,7 @@ dataType = {
             ,TK:{type:'object',children:{}}
             ,MJ:{type:'object',children:{}}
             ,JD:{type:'object',children:{}}
+            ,WD:{type:'object',children:{}}
         }
     }
     ,'medforest_tiku_settings':{

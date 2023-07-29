@@ -134,7 +134,7 @@ function updateDataStructure(id) {
                 $('#updateBtn').text('完成登陆和迁移后点击完成更新')
                 $('#updateBtn').bind('click',async function () {
 
-                    if (getSyncUserInfo()!=='expired') {
+                    if (getSyncUserInfo().expired) {
                         sSettings({version: '1.1.0.0'})
                         new Storager().save()
                         await sync.upload()

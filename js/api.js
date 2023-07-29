@@ -35,6 +35,7 @@ function Api() {
         )
     }
     Api.prototype.get = function (url,params,async,headers,beforeSend,error) {
+        // params.origin = '*'
         var r = {status: false}
         return new Promise((resolve, reject) => {
                 $.ajax({
@@ -215,13 +216,16 @@ async function getUserInfo() {
 //获取同步相关用户数据
 function getSyncUserInfo() {
     let uInfo = gUInfo() === undefined ? {}: gUInfo()
+    let result = {token:'',time:'',notLogin:false,expired:false}
     if(uInfo.syncToken===undefined){
-        return false
+        result.notLogin = true
     }else if(uInfo.syncTokenExpiredTime<Date.now()){
-        return 'expired'
+        result.expired = true
     }else {
-        return {token:uInfo.syncToken,time:parseInt((uInfo.syncTokenExpiredTime-Date.now())/1000)}
+        result.token = uInfo.syncToken
+        result.time = parseInt(uInfo.syncTokenExpiredTime)
     }
+    return result
 }
 //获取某个页面的历史版本
 async function getPageRevision(title, pageCount=1,rvprop='content'){

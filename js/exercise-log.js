@@ -71,14 +71,16 @@ function Logger() {
             icon:icon.download
         })
     }
-    Logger.prototype.sync_inni_e = function (t,u) {
+    Logger.prototype.sync_inni_e = function (t,u,s) {
         newToast({
             level:'error',
             title:'用户信息获取错误！',
             subTitle:formatedTime,
-            content:'<b>警告，用户信息获取错误！加载结束！</b>' +
-                '<br>获取TOKEN:'+t +
-                '<br>获取UserInfo:'+u,
+            content:'<b>警告，用户信息初始化出错！</b>' +
+                '<br>编辑Token:'+t +
+                '<br>医林拾薪用户ID:'+u+
+                '<br>同步服务器Token:'+s+
+                '<br><a href="javasvript:viod(0)" data-toggle="modal" data-target="#login">>>点击注册或登录<<</a>',
             icon:icon.download
         })
     }

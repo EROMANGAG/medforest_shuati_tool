@@ -569,5 +569,16 @@ function newTimu(id,json,editButton, hideButton,addHr,parent=''){
         if(addHr){this.temp.main.append('<hr>')}
         return this.temp.main
     }
+    o.WD = function () {
+        this.temp.type.text('问答')
+        this.temp.source.text(json.source)
+        this.temp.title.html(json.title + '：<span class="blur" tabindex="0" style="display:inline;outline=0;" onclick="">' + json.answer +'</span>')
+        this.temp.titleCon.append(this.temp.type,this.temp.source,this.temp.title)
+        this.temp.subject.append(this.temp.titleCon,this.temp.options)
+        this.temp.main.append(this.temp.subject)
+
+        if(addHr){this.temp.main.append('<hr>')}
+        return this.temp.main
+    }
     return o
 }
