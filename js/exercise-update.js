@@ -186,6 +186,22 @@ function updateDataStructure(id) {
                 $('#updateBtn').prop('disabled',false)
             }
         }
+        ,'1.1.2to1.3.0': async function () {
+            await new Sync().innitiate()
+            if (gUInfo().id !== 0 && gUInfo().syncToken !== '0') {
+                await updateScript()
+                alert('升级完成！点击确认刷新页面')
+                sSettings({version: '1.3.0'})
+                new Storager().save()
+                await new Sync().upload()
+                window.location.reload(true)
+            } else {
+                alert('未登录！如果您以前使用过本工具，请登录后再升级！否则会导致升级无法生效！')
+                $('#login').modal('show')
+                $('#updateBtn').text('重试')
+                $('#updateBtn').prop('disabled',false)
+            }
+        }
     }
     o[id]()
 }
@@ -233,6 +249,16 @@ function checkAndShowUpdate(version=undefined) {
                 $('#updateBtn').unbind()
                 $('#updateBtn').bind('click',function () {
                     updateDataStructure('1.1.1.0to1.1.2')
+                })
+                $('#updateBtn').attr('disabled','disabled')
+                $('#updateBtn').text('自动升级中...')
+                $('#updateBtn').click()
+            }else if(version === '1.3.0'){
+                console.log(version)
+                $('#130').fadeIn('fast')
+                $('#updateBtn').unbind()
+                $('#updateBtn').bind('click',function () {
+                    updateDataStructure('1.1.2to1.3.0')
                 })
                 $('#updateBtn').attr('disabled','disabled')
                 $('#updateBtn').text('自动升级中...')

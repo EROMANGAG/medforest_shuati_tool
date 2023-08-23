@@ -238,17 +238,15 @@ i{
         font-size: 20px;
         transition-duration: 300ms;
     }
-    .subjectContainer{
-        font-size: 27px;
+    .timuContainer{
+        font-size: 20px;
         transition-duration: 300ms;
     }
-    .ansContainer{
-        font-size: 27px;
-        transition-duration: 300ms;
+    .optionInline>input{
+        width: 16px;
     }
-    input[type=checkbox], input[type=radio]{
-        height: 16px;
-        transition-duration: 300ms;
+    .optionInline{
+        margin-right: 1px;
     }
 }
 @media screen and (max-width: 550px){
@@ -297,17 +295,12 @@ i{
         font-size: 15px;
         transition-duration: 300ms;
     }
-    .subjectContainer{
-        font-size: 22px;
+    .timuContainer{
+        font-size: 17px;
         transition-duration: 300ms;
     }
-    .ansContainer{
-        font-size: 22px;
-        transition-duration: 300ms;
-    }
-    input[type=checkbox], input[type=radio]{
-        height: 14px;
-        transition-duration: 300ms;
+    .optionInline>input{
+        width: 13px;
     }
 }
 @media screen and (max-width: 400px){

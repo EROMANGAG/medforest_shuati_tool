@@ -1,20 +1,20 @@
 versions = {
-    current:'1.1.2',
+    current:'1.3.0',
     branch:'1',
     type:'hotfix'
 }
-// urls = {
-//     origin:'https://www.medforest.cn/',
-//     url:'https://www.medforest.cn/medf',
-//     apibase:'https://www.medforest.cn/medf/api.php',
-//     apiSync:'https://www.medforest.cn/tikuSync'
-// }
 urls = {
-    origin:'http://dav.medforest.cn/',
-    url:'http://dav.medforest.cn/medf',
-    apibase:'http://dav.medforest.cn/medf/api.php',
-    apiSync:'http://dav.medforest.cn/tikuSync'
+    origin:'https://www.medforest.cn/',
+    url:'https://www.medforest.cn/medf',
+    apibase:'https://www.medforest.cn/medf/api.php',
+    apiSync:'https://www.medforest.cn/tikuSync'
 }
+// urls = {
+//     origin:'http://dav.medforest.cn/',
+//     url:'http://dav.medforest.cn/medf',
+//     apibase:'http://dav.medforest.cn/medf/api.php',
+//     apiSync:'http://dav.medforest.cn/tikuSync'
+// }
 
 colors = {
     error:'#ff9e98',

@@ -44,22 +44,10 @@ function isLastExerciseSaved() {
 }
 //获取解析的页面并从中提取题目存到localstore中
 async function loadFromWeb({title=undefined,revid=undefined}={}) {
-    let log = new Logger()
-    let api = new Api()
     console.log(title,revid)
     let r = {status: false, result: {}}
-    let results = await api.get(urls.apibase,{
-        "action": "parse",
-        "format": "json",
-        "page": title,
-        'oldid':revid,
-        "utf8": 1,
-        "prop": "text|revid",
-        'origin': '*',
-    }, false).catch(e=>{
-        log.download_timu_e(e)
-        return r
-    })
+    //获取对应题库页面内容
+    let results = await getParsedTikuText(title,revid)
     r.result = JSON.parse(dataStructure.typesDic)
     let parsedData = results.result.parse
     let parsedObj = $(results.result.parse.text["*"])
@@ -70,26 +58,48 @@ async function loadFromWeb({title=undefined,revid=undefined}={}) {
         function (index,ele) {
             //将题目中的HTML节点转换为文本
             let singleData = $(ele).html()
-            console.log(singleData)
-            if ($(this).children().length > 0) {
-                $(this).children().each(
-                    function (n, v) {
-                        var innerHTML = entityToString(v)
-                        var escape = ''
-                        escape = innerHTML.replace(/"/g, '\\"')
-                        //修正：如果有math则提示不可显示
-                        var mathReg = new RegExp('\[math\]','g')
-                        if(mathReg.test(innerHTML)){
-                            escape = '<b>暂不支持显示公式</b>'
+            let dataJSON
+            let dataWikitext;
+            let dataHTMLTags;
+            try{
+                //1.把获取的文本转为json
+                dataJSON = $.parseJSON(singleData)
+                //2.
+                dataWikitext = dataJSON.wikitext;
+                for (let i in dataWikitext) {
+                    let parsedText = html_entity_decode(dataWikitext[i]['parse']);
+                    let outerHTML = $($(parsedText).children().prop('outerHTML'));
+                    // 检测是否有table的标签,table需要用table-inline 的 css
+                    let hasTableTag = new RegExp('<table[\\s\\S]*?>').test(outerHTML.prop('outerHTML'));
+                    outerHTML.css('display', hasTableTag ? 'inline-table' : 'inline');
+                    dataWikitext[i]['parse'] = outerHTML.prop('outerHTML');
+                }
+                dataJSON.dataWikitext = dataWikitext
+                dataHTMLTags = dataJSON.htmlTags;
+                for (let i in dataHTMLTags) {
+                    // 获取的html中可能有多个并列的node，需要筛选有内容的并全部提取储存
+                    let nonEmptyElement = [];
+                    // 检测是否有table的标签,table需要用table-inline 的 css
+                    let hasTableTag = false;
+                    let parsedText = html_entity_decode(dataHTMLTags[i]['parse']);
+                    let parsedTextObjChildren = $(parsedText).children();
+                    parsedTextObjChildren.each(function (index, element) {
+                        hasTableTag = new RegExp('<table[\\s\\S]*?>').test(element);
+                        if (!$(element).is(":empty")) {
+                            nonEmptyElement.push($(element).prop('outerHTML'));
                         }
-                        singleData = singleData.replace(innerHTML, escape)
-                    }
-                )
+                    });
+                    let outerHTML = $(nonEmptyElement.join(''));
+                    outerHTML.css('display', hasTableTag ? 'inline-table' : 'inline');
+                    dataHTMLTags[i]['parse'] = outerHTML.prop('outerHTML');
+                }
+                dataJSON.dataHTMLTags = dataHTMLTags;
+            }catch (e) {
+                dataJSON= {type:'A',title:'本题加载出错'}
             }
-            singleData = singleData.replace(/\n/g,'\\n')
-            let content = $.parseJSON(singleData)
-            content.defaultOrder = index
-            r.result[content.type].push(content)
+
+            dataJSON.defaultOrder = index
+            r.result[dataJSON.type].push(dataJSON)
         }
     )
     r.status = true

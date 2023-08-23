@@ -496,3 +496,19 @@ async function createArchive(id,data,token) {
     console.log(r)
     return r
 }
+
+//从mediawiki获对应题库取parsed page text
+async function getParsedTikuText(title,revid) {
+    return new Api().get(urls.apibase,{
+        "action": "parse",
+        "format": "json",
+        "page": title,
+        'oldid':revid,
+        "utf8": 1,
+        "prop": "text|revid",
+        'origin': '*',
+    }, false).catch(e=>{
+        new Logger().download_timu_e(e)
+        return {status: false, result: {}}
+    })
+}

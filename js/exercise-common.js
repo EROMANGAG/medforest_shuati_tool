@@ -58,6 +58,14 @@ function isInList(item,list) {
         return index
     }
 }
+function isInArray(arr, value) {
+    for (var i = 0; i < arr.length; i++) {
+        if (value === arr[i]) {
+            return true;
+        }
+    }
+    return false;
+}
 function isInDic(dic,val) {
     for(var k in dic){
         if(dic[k]===val){
@@ -138,4 +146,21 @@ function secondsToFormated(time) {
     const second = Math.ceil(time % 60)
 
     return d+'d'+h+'h'+minute+'m'+second+'s'
+}
+// HTML反转义
+function html_entity_decode(str) {
+    const entities = {
+        '&amp;': '&',
+        '&lt;': '<',
+        '&gt;': '>',
+        '&quot;': '"',
+        '&#039;': '\'',
+        '&#x2F;': '/',
+    };
+    while (new RegExp('&[a-z]+;', 'g').test(str)) {
+        str = str.replace(/&[a-z]+;/g, entity => {
+            return entities[entity] || entity;
+        });
+    }
+    return str;
 }

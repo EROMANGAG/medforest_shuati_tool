@@ -27,7 +27,6 @@ function Storager() {
             console.log(data[key])
             store.set('medforest_tiku_' + key, data[key])
         }
-        let revid = data.list.revid
         //已覆盖完毕
         log.store_load_s(id)
         console.info(`>>Storager.load(${id})`,gInfo())
@@ -78,6 +77,7 @@ function updateResults(id,isRight,uOpt) {
         r[type][pos]['isRight'] = isRight
         r[type][pos]['choice'] = uOpt.slice(0)
     }
+    console.log(r)
     sResults(r)
     return {isDone:done,isRight:isRight}
 }

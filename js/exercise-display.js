@@ -116,18 +116,37 @@ function progressBar() {
 //=================================
 function loadAnscardOptions(){
     let info = gInfo()
+    let list = gList()
     let results= gResults()
     let order = info.order
     let total = info.total
     let select = $('#jumpSelect')
     // select.append('<div><h4>答题卡</h4><div id="ansCard" class="d-flex justify-content-start flex-wrap"></div></div><hr>')
     let content = $('<div id="ansCard"></div>')
+    let displayText;
+    let displayId = 1;
+    let sourceRange;
+    let button;
     for(let i=0;i<total;i++){
         let type = order[i].split('-')[0]
-        let pos = order[i].split('-')[1]*1
-        let button = $(
-            '<button class="button button-circle m-1 font-weight-bold" style="position: relative;width:40px;height:40px;font-size: 16px" id="jump-'+i+'" onclick="jumpAnsCard('+i+')">' +
-            '<span>'+(i+1)+'</span><span class="anscard-type">'+type +'</span></button>')
+        let id = order[i].split('-')[1]
+        if(type === 'B'||type==='C'||type==='A3'){
+            sourceRange = list.content[type][id].sourceRange * 1
+            displayText = displayId +'-'+(displayId+sourceRange-1)
+            displayId += sourceRange
+            button = $(
+                '<button class="button m-1 font-weight-bold" ' +
+                'style="position: relative;border-radius: 40px;height:40px;font-size: 16px;width: auto;white-space: nowrap;" id="jump-'+i+'" onclick="jumpAnsCard('+i+')">' +
+                '<span>'+displayText+'</span><span class="anscard-type">'+type +'</span></button>')
+        }else {
+            displayText = displayId
+            displayId += 1
+            button = $(
+                '<button class="button button-circle m-1 font-weight-bold" ' +
+                'style="position: relative;height:40px;font-size: 16px;width: 40px;white-space: nowrap;" id="jump-'+i+'" onclick="jumpAnsCard('+i+')">' +
+                '<span>'+displayText+'</span><span class="anscard-type">'+type +'</span></button>')
+        }
+
         content.append(button)
 
     }
@@ -159,7 +178,7 @@ function updateAnscardStatus(absPos){
         }
     }
     if(only.f==='true'||only.w==='true'){
-        console.log('11111')
+        // console.log('11111')
         button.attr('disabled','disabled')
         // button.fadeOut(300)
         button.removeClass('font-weight-bold')
@@ -244,341 +263,804 @@ function noTikuPath() {
 
 }
 //题目模板
-function newTimu(id,json,editButton, hideButton,addHr,parent=''){
-    parent = parent !== undefined ? parent : ''
-    addHr = addHr !== undefined ? addHr :　true
-    hideButton = hideButton !== undefined ? hideButton : false
-    let type = json.type
-    let o = {}
 
-    //将choice 统一为Array的转换
-    if(typeOfObj(json.choices)==='[object Array]'&&json.choices.length===1&&type!=='A3'){
-        json.choices = json.choices[0]
+function replaceWikitextUNITToHTML(json) {
+    let wikitextList = json.dataWikitext
+    let dataHTMLTags = json.dataHTMLTags
+    json = JSON.stringify(json);
+    // console.log(wikitextList);
+    for (let i in wikitextList) {
+        let reg = new RegExp(i.replace(/\^\$\.\*\+\?\|\\\/\(\)\[\]\{\}\=\!\:\-\,/g, (key) => `\\${key}`), 'g');
+        let parsed = wikitextList[i]['parse'];
+        parsed = JSON.stringify(parsed);
+        parsed = parsed.substr(1, parsed.length - 2);
+        json = json.replace(reg, parsed);
     }
-
-    o.temp = {
-        main:$('<div id="'+id+'" class="type'+type+' timu"></div>'),
-        subject:$('<div class="subject"></div>'),
-        range:$('<div class="sourceRange"></div>'),
-        info:$('<div class="info"></div>'),
-        titleCon:$('<div class="titleContainer"></div>'),
-        type:$('<p class="type">'+type+'</p>'),
-        source:$('<p class="source"></p>'),
-        title:$('<p class="title"></p>'),
-        options:$('<div class="options"></div>'),
-        btn:$('<button class="button button-caution showAnswer" id="showAnsBtn-' + id + '" class="showSingleBtn">提交</button>'),
-        editBtn:$('<br><a class="editThisButton" style="font-size: 14px;margin-left: 10px" href="javascript:void(0)"><span class="" id="editThis-' + id + '">' +
-            '编辑本题或添加解析</span></a>'),
-        favoriteBtn:$('<button class="favorite-btn button button-square"></button>'),
-        ansCon:$('<div id="ansContainer" class="ansContainer noDisplay"></div>'),
-        correct:$('<p style="display:inline;"><b>正确答案：</b></p><p class="correctAnswer"></p><br>'),
-        explain:$('<p style="display:inline;"><b>解析： </b></p><p class="explain"></p>'),
-        select:$('<select class="button-small button-rounded button"></select>'),
-        subTitle:$('<div id="" class="subTitle"></div>'),
-        next:$('<button class="button" id="nextSmall"> 下一题 </button>'),
-        last:$('<button class="button" id="lastSmall"> 上一题 </button>'),
-        btns:$('<div id="btn-set"></div>')
+    for (let i in dataHTMLTags) {
+        let reg = new RegExp(i.replace(/\^\$\.\*\+\?\|\\\/\(\)\[\]\{\}\=\!\:\-\,/g, (key) => `\\${key}`), 'g');
+        let parsed = dataHTMLTags[i]['parse'];
+        parsed = JSON.stringify(parsed);
+        parsed = parsed.substr(1, parsed.length - 2);
+        json = json.replace(reg, parsed);
     }
-    o.hideButton = hideButton
-    o.parent = parent
-    o.temp.next.bind('click',function () {
-        next()
-    })
-    o.temp.last.bind('click',function () {
-        last()
-    })
-    if(id in gInfo().favorite){
-        o.temp.favoriteBtn.addClass('button-action')
-        o.temp.favoriteBtn.html('<i class="bi-star-fill m-0"></i>')
-    }else {
-        o.temp.favoriteBtn.addClass('button-highlight')
-        o.temp.favoriteBtn.html('<i class="bi-star m-0"></i>')
-    }
-    o.temp.favoriteBtn.bind('click',function () {
-        toggleFavorate(id)
-    })
-    if(type!=='A3'){
-        o.temp.btn.bind("click",function (){
-            let sync = new Sync()
-            let storager = new Storager()
-            updateProgress()
-            showAns(id,type,json.answer)
-            updateAnscardStatus(id)
-            $(this).fadeOut(1)
-            storager.save()
-            //新增判断是否自动上传设置
-            if(gSautoSync()){
-                sync.upload()
-            }
-        })
-    }
-    if(type!=='A3'&&type!=='PD'){
-        o.temp.editBtn.bind("click",function (){
-            editThis(id)
-            $(this).fadeOut(1)
-        })
-    }
-    o.temp.btns.append(o.temp.btn,o.temp.favoriteBtn,o.temp.next,o.temp.last,o.temp.editBtn)
-    o.A = function () {
-        this.temp.source.text(json.source)
-        this.temp.title.html(json.title.replace(/\\n/g,'\n'))
-        console.log(json.title)
-        this.temp.correct.nextAll('.correctAnswer').text(json.answer)
-        this.temp.explain.nextAll('.explain').html(json.explain)
-        let options = formatAnsOrder(json.choices)
-        for(let k in options) {
-            let label = '<label class="' + k + '"><input name="option-' + id + '" type="radio" value="' + k + '" />' + k + '：' + options[k] + '</label>'
-            this.temp.options.append(label)
-        }
-        this.temp.titleCon.append(this.temp.type,this.temp.source,this.temp.title)
-        this.temp.ansCon.append(this.temp.correct,this.temp.explain)
-        this.temp.subject.append(this.temp.titleCon,this.temp.options)
-        if(!hideButton){this.temp.subject.append(this.temp.btns)}
-        this.temp.main.append(this.temp.subject,this.temp.ansCon)
-
-        if(addHr){this.temp.main.append('<hr>')}
-        return this.temp.main
-    }
-    o.A2 = function () {
-        this.temp.source.text(json.source)
-        this.temp.title.html(json.title)
-        this.temp.correct.nextAll('.correctAnswer').text(json.answer)
-        this.temp.explain.nextAll('.explain').html(json.explain)
-        let options = formatAnsOrder(json.choices)
-        for(let k in options) {
-            let label = '<label class="' + k + '"><input name="option-' + id + '" type="radio" value="' + k + '" />' + k + '：' + options[k] + '</label>'
-            this.temp.options.append(label)
-        }
-        this.temp.titleCon.append(this.temp.type,this.temp.source,this.temp.title)
-        this.temp.ansCon.append(this.temp.correct,this.temp.explain)
-        this.temp.subject.append(this.temp.titleCon,this.temp.options)
-        if(!hideButton){this.temp.subject.append(this.temp.btns)}
-        this.temp.main.append(this.temp.subject,this.temp.ansCon)
-
-        if(addHr){this.temp.main.append('<hr>')}
-        return this.temp.main
-    }
-    o.A3 = function () {
-        let subIDs = []
-        let s = json.source*1;let e = json.source*1+json.sourceRange*1 -1
-        this.temp.range.text('第 '+s+' 到 '+e+' 题')
-        for(let i=0;i<json.title.length;i++){
-            subIDs.push(id+'-'+i)
-            if(json.explain[i]===undefined){
-                json.explain[i] = '暂无解析'
-            }
-            let data = {
-                "type":"A3",
-                "source":json.source*1 + i,
-                "title":json.title[i],
-                "answer":json.answer[i],
-                "explain":json.explain[i],
-                "choices":json.choices[i],
-            }
-            this.temp.titleCon.append(
-                newTimu(id+'-'+i,data,false,true,false).A()
-            )
-        }
-        o.temp.btn.bind("click",function (){
-            let sync = new Sync()
-            let storager = new Storager()
-            updateProgress()
-            showAns(subIDs,type,json.answer)
-            updateAnscardStatus(id)
-            $(this).fadeOut(1)
-            storager.save()
-            //新增判断是否自动上传设置
-            if(gSautoSync()){
-                sync.upload()
-            }
-        })
-        this.temp.info.text(json.info)
-        this.temp.subject.append(this.temp.range,this.temp.info,this.temp.titleCon)
-        if(!hideButton){this.temp.subject.append(this.temp.btns)}
-        this.temp.main.append(this.temp.subject)
-
-        if(addHr){this.temp.main.append('<hr>')}
-        return this.temp.main
-    }
-    o.B = function () {
-        let s = json.source*1;let e = json.source*1+json.sourceRange*1 -1
-        this.temp.range.text('第 '+s+' 到 '+e+' 题')
-
-        let options = formatAnsOrder(json.choices)
-        let i = 0
-        let row = $('<div class="row"></div>')
-        for(let k in options){
-            if(json.choices[k].length>0){
-                let label = '<div class="col" id="' + k + '">' + k+':'  + json.choices[k] + '</div>'
-                row.append($(label))
-                if((i+1) % 2 === 0){
-                    this.temp.options.append(row)
-                    row = $('<div class="row"></div>')
-                }
-                i+=1
-            }
-            this.temp.select.append('<option value="'+k+'">'+k+'</option>')
-        }
-        this.temp.options.addClass('bcOptions')
-        this.temp.options.append(row)
-        for(let i=0;i<json.title.length;i++){
-            let title = $('<p class="titleBC">'+json.title[i]+'</p>').append(this.temp.select)
-            console.log(this.temp.subTitle.text())
-            this.temp.subTitle.attr('id',id+'-'+i)
-            this.temp.source.text(s+i)
-            this.temp.subTitle.empty()
-            this.temp.subTitle.append(this.temp.type,this.temp.source,title)
-            this.temp.titleCon.append(this.temp.subTitle.prop("outerHTML"))
-        }
-        for(let i=0;i<json.answer.length;i++){
-            this.temp.correct.nextAll('.correctAnswer').append('<p id="ans-'+id +'-'+i+'">'+(s+i)+'：'+json.answer[i]+'</p>')
-        }
-        for(let i=0;i<json.explain.length;i++){
-            this.temp.explain.nextAll('.explain').append('<p id="exp-'+id +'-'+i+'">'+(s+i)+'：'+json.explain[i]+'</p>')
-        }
-
-        this.temp.subject.append(this.temp.range,this.temp.options,this.temp.titleCon)
-        if(!hideButton){this.temp.subject.append(this.temp.btns)}
-        this.temp.ansCon.append(this.temp.explain)
-        this.temp.main.append(this.temp.subject,this.temp.ansCon)
-
-        if(addHr){this.temp.main.append('<hr>')}
-        return this.temp.main
-    }
-    o.C = function () {
-        let s = json.source*1;let e = json.source*1+json.sourceRange*1 -1
-        this.temp.range.text('第 '+s+' 到 '+e+' 题')
-
-        let options = formatAnsOrder(json.choices)
-        let i = 0
-        let row = $('<div class="row"></div>')
-        for(let k in options){
-            if(json.choices[k].length>0){
-                let label = '<div class="col" id="' + k + '">' + k+':' + json.choices[k] + '</div>'
-                row.append($(label))
-                if((i+1) % 2 === 0){
-                    this.temp.options.append(row)
-                    row = $('<div class="row"></div>')
-                }
-                i+=1
-            }
-            this.temp.select.append('<option value="'+k+'">'+k+'</option>')
-        }
-        this.temp.options.addClass('bcOptions')
-        this.temp.options.append(row)
-        for(let i=0;i<json.title.length;i++){
-            let title = $('<p class="titleBC">'+json.title[i]+'</p>').append(this.temp.select)
-            console.log(this.temp.subTitle.text())
-            this.temp.subTitle.attr('id',id+'-'+i)
-            this.temp.source.text(s+i)
-            this.temp.subTitle.empty()
-            this.temp.subTitle.append(this.temp.type,this.temp.source,title)
-            this.temp.titleCon.append(this.temp.subTitle.prop("outerHTML"))
-        }
-        for(let i=0;i<json.answer.length;i++){
-            this.temp.correct.nextAll('.correctAnswer').append('<p id="ans-'+id +'-'+i+'">'+(s+i)+'：'+json.answer[i]+'</p>')
-        }
-        for(let i=0;i<json.explain.length;i++){
-            this.temp.explain.nextAll('.explain').append('<p id="exp-'+id +'-'+i+'">'+(s+i)+'：'+json.explain[i]+'</p>')
-        }
-
-        this.temp.subject.append(this.temp.range,this.temp.titleCon,this.temp.options)
-        if(!hideButton){this.temp.subject.append(this.temp.btns)}
-        this.temp.ansCon.append(this.temp.explain)
-        this.temp.main.append(this.temp.subject,this.temp.ansCon)
-
-        if(addHr){this.temp.main.append('<hr>')}
-        return this.temp.main
-    }
-    o.X = function () {
-        this.temp.source.text(json.source)
-        this.temp.title.html(json.title)
-        this.temp.correct.nextAll('.correctAnswer').text(json.answer)
-        this.temp.explain.nextAll('.explain').html(json.explain)
-        let options = formatAnsOrder(json.choices)
-        for(let k in options){
-            let label = '<label class="'+k+'"><input name="option-'+id+'" type="checkbox" value="'+k+'" />'+k+'：'+options[k]+'</label>'
-            this.temp.options.append(label)
-        }
-
-        this.temp.titleCon.append(this.temp.type,this.temp.source,this.temp.title)
-        this.temp.ansCon.append(this.temp.correct,this.temp.explain)
-        this.temp.subject.append(this.temp.titleCon,this.temp.options)
-        if(!hideButton){this.temp.subject.append(this.temp.btns)}
-        this.temp.main.append(this.temp.subject,this.temp.ansCon)
-
-        if(addHr){this.temp.main.append('<hr>')}
-        return this.temp.main
-    }
-    o.PD = function () {
-        this.temp.type.text('判断')
-        this.temp.source.text(json.source)
-        this.temp.title.html(json.title)
-        this.temp.explain.nextAll('.explain').html(json.explain)
-        let ans = ''
-        if(json.answer=='T' || json.answer=='正确' || json.answer=='1' || json.answer=='√'){
-            ans = '正确'
-        }else if(json.answer=='F' || json.answer=='错误' || json.answer=='0' || json.answer=='×'){
-            ans = '错误'
-        }
-        this.temp.correct.nextAll('.correctAnswer').text(ans)
-
-        this.temp.options.append('<label class="正确" style="display: inline;"><input name="option-'+id+'" type="radio" value="正确" />正确</label>' +
-            '<label class="错误" style="display: inline;"><input name="option-'+id+'" type="radio" value="错误" />错误</label>')
-        this.temp.titleCon.append(this.temp.type,this.temp.source,this.temp.title)
-        this.temp.ansCon.append(this.temp.correct,this.temp.explain)
-        this.temp.subject.append(this.temp.titleCon,this.temp.options)
-        if(!hideButton){this.temp.subject.append(this.temp.btns)}
-        this.temp.main.append(this.temp.subject,this.temp.ansCon)
-
-        if(addHr){this.temp.main.append('<hr>')}
-        return this.temp.main
-    }
-    o.TK = function () {
-        this.temp.type.text('填空')
-        this.temp.source.text(json.source)
-        let form = $('<form id="form-'+id+'" class="title"></form>')
-        let pos = json.pos
-        let posReg = new RegExp(pos,'g')
-        let posCount = json.title.match(posReg).length
-        for(let i=0;i<posCount;i++){
-            json.title = json.title.replace(pos,'<input name="'+id+'-'+i+'" id="'+id+'-'+i+'" type="text" form="form-'+id+'"/>')
-        }
-        form.html(json.title)
-        this.temp.title.html(json.title)
-        this.temp.correct.nextAll('.correctAnswer').text(json.answer)
-        this.temp.explain.nextAll('.explain').html(json.explain)
-
-        this.temp.titleCon.append(this.temp.type,this.temp.source,form)
-        this.temp.ansCon.append(this.temp.correct,this.temp.explain)
-        this.temp.subject.append(this.temp.titleCon,this.temp.options)
-        if(!hideButton){this.temp.subject.append(this.temp.btns)}
-        this.temp.main.append(this.temp.subject,this.temp.ansCon)
-
-        if(addHr){this.temp.main.append('<hr>')}
-        return this.temp.main
-    }
-    o.MJ = function () {
-        this.temp.type.text('名解')
-        this.temp.source.text(json.source)
-        this.temp.title.html(json.title + '：<span class="blur" tabindex="0" style="display:inline;outline=0;" onclick="">' + json.answer +'</span>')
-        this.temp.titleCon.append(this.temp.type,this.temp.source,this.temp.title)
-        this.temp.subject.append(this.temp.titleCon,this.temp.options)
-        this.temp.main.append(this.temp.subject)
-
-        if(addHr){this.temp.main.append('<hr>')}
-        return this.temp.main
-    }
-    o.WD = function () {
-        this.temp.type.text('问答')
-        this.temp.source.text(json.source)
-        this.temp.title.html(json.title + '：<span class="blur" tabindex="0" style="display:inline;outline=0;" onclick="">' + json.answer +'</span>')
-        this.temp.titleCon.append(this.temp.type,this.temp.source,this.temp.title)
-        this.temp.subject.append(this.temp.titleCon,this.temp.options)
-        this.temp.main.append(this.temp.subject)
-
-        if(addHr){this.temp.main.append('<hr>')}
-        return this.temp.main
-    }
-    return o
+    // console.log(json);
+    return JSON.parse(json);
 }
+//题目渲染函数
+function ParseTimu(id, data) {
+    //基础信息
+    this.id = id;
+    this.type = data.type === undefined ? 'A' : data.type;// String，默认是A
+    this.pos = data.pos === undefined ? '（）' : data.pos;// String 默认为（）
+    this.inputBox = data.inputBox === undefined ? '1' : data.inputBox;// String 默认为 0
+    this.originalSource = data.source === undefined ? '0000' : data.source;// String
+    this.source = getRealSource(this.originalSource).source;
+    this.sourcePrefix = getRealSource(this.originalSource).prefix;
+    this.sourceSuffix = getRealSource(this.originalSource).suffix;
+    this.sourceRange = data.sourceRange === undefined ? 1 : data.sourceRange * 1;// String 需要转换为数字使用
+    this.info = data.info === undefined ? '未填写信息' : data.info;// String
+    this.title = data.title === undefined ? ['未填写题目'] : data.title;// Array
+    this.options = data.choices === undefined ? [{ A: '未填写选项' }] : data.choices;// Array
+    this.answer = data.answer === undefined ? ['未填写答案'] : data.answer;// Array
+    this.explain = data.explain === undefined ? ['未填写解释'] : data.explain;// Array
+    //如果是判断题，需要对答案进行转换
+    if (this.type === 'PD') {
+        // console.log(this.answer);
+        if (isInArray(['对', '正确', 't', 'T', '✓', '√', '1', 'true', 'right'], this.answer[0])) {
+            this.answer[0] = 'A';
+        } else if (isInArray(['错', '错误', '×', 'x', 'f', 'F', 'false', 'wrong', '0'], this.answer[0])) {
+            this.answer[0] = 'B';
+        } else {
+            this.answer[0] = '系统提示: 该判断题答案不符合标准格式';
+        }
+    }
+
+
+    this.typesChinese = {
+        A: 'A',
+        A2: 'A2',
+        A3: 'A3',
+        B: 'B',
+        C: 'C',
+        X: 'X',
+        TK: '填空',
+        PD: '判断',
+        MJ: '名解',
+        WD: '问答'
+    };
+
+    this.prefixDic = {
+        formId: 'timuForm-',
+        titleInlineId: 'title-',
+        radioName: 'radio-',
+        radioId: 'radio-input-',
+        checkboxName: 'checkbox-',
+        checkboxId: 'checkbox-input-',
+        selectId: 'select-',
+        selectName: 'select-',
+        textInputName: 'text-',
+        textInputId: 'text-',
+        textareaInputId: 'textarea-',
+        textareaInputName: 'textarea-',
+    };
+    prefixDic = this.prefixDic;
+
+    this.componentsHTML = {
+        main: '<div name="timu-' + (id + 1) + '" id="' + id + '" class="type' + this.type + ' timuContainer"><p class="timuID">' + id + '</p></div>',
+        form: '<form id="' + this.prefixDic.formId + id + '" class="subjectForm"></form>',
+        type: '<p class="type"></p>',
+        source: '<p class="source"></p>',
+        title: '<p class="title"></p>',
+        titleInline: '<div class="titleInline"></div>',
+        titlesGroup: '<div class="titlesGroup"></div>',
+        select: '<select class="dropdown" ></select>',
+        option: '<option class="dropdown-option"></option>',
+        optionsInline: '<div class="optionInline"></div>',
+        optionsGroup: '<div class="optionsGroup"></div>',
+        optionsInlineBC: '<div class="optionInlineBC"></div>',
+        optionsGroupBC: '<div class="optionsGroupBC"></div>',
+        input: '<input />',
+        textarea: '<textarea class="textarea-input" rows="5"></textarea>',
+        moasic: '<span class="blur" tabindex="0" style="display:inline;outline=0;" onclick=""></span>',
+        label: '<label></label>',
+        sourceRange: '<div class="sourceRange"></div>',
+        buttonsGroup: '<div class="buttonGroup"></div>',
+        resultGroup: '<div class="resultGroup"></div>',
+        answer: '<div class="answerInline"><label>正确答案：</label></div>',
+        explain: '<div class="explainInline"><label>解析：</label></div>',
+        info: '<div class="info"></div>',
+    };
+
+    let isInFavorate = id in gInfo().favorite
+    // console.log('isInFavorate',isInFavorate)
+    let favoriteClass = isInFavorate?'button-action':'button-highlight'
+    let favoriteBi = isInFavorate?'<i class="bi-star-fill m-0"></i>':'<i class="bi-star m-0"></i>'
+    this.buttons = {
+        submit: {
+            btn: $('<button class="button button-caution showAnswer" id="showAnsBtn-' + id + '" class="showSingleBtn">提交</button>'),
+            callback: {
+                click: ({ id = this.id, timuType = this.type, correctAnswer = this.answer } = {}) => {
+                    let sync = new Sync()
+                    let storager = new Storager()
+                    let choosedAnswer = this.getThisChooseAnswer();
+                    let checkResult = this.showThisAnswer({ choosedAnswer: choosedAnswer, correctAnswer: correctAnswer });
+                    updateResults(id,checkResult,choosedAnswer.array)
+                    updateAnscardStatus(id)
+                    storager.save()
+                    if(gSautoSync()){
+                        sync.upload()
+                    }
+                }
+            }
+        },
+        favorate:{
+            btn:$('<button class="favorite-btn button button-square '+favoriteClass+'">' +favoriteBi+'</button>'),
+            callback: {
+                click:()=>{
+                    toggleFavorate(id)
+                }
+            }
+        },
+        next:{
+            btn:$('<button class="button" id="nextSmall"> 下一题 </button>'),
+            callback: {
+                click:()=>{
+                    next()
+                }
+            }
+        },
+        last:{
+            btn:$('<button class="button" id="lastSmall"> 上一题 </button>'),
+            callback: {
+                click:()=>{
+                    last()
+                }
+            }
+        }
+    };
+    //存储结果
+    this.parsedObj = {};
+    //Map
+    this.parsedParams = new Map();
+}
+/*
+* 小组件部分
+ */
+//生成form组件，并绑定事件
+ParseTimu.prototype.form = function ({ id = this.id, type = this.type, bind = true } = {}) {
+    let form = $(this.componentsHTML.form);
+    return form;
+};
+//生成info
+ParseTimu.prototype.infoInline = function ({ info = this.info } = {}) {
+    let infoObj = $(this.componentsHTML.info).append(info);
+    this.parsedParams.set('info', infoObj);
+    return infoObj;
+};
+
+//生成titleGroup
+ParseTimu.prototype.titlesGroup = function (
+    {
+        id = this.id,
+        type = this.type,
+        sourcePrefix = this.sourcePrefix,
+        sourceSuffix = this.sourceSuffix,
+        beginningSource = this.source,
+        titles = this.title
+    } = {}) {
+    let group = $(this.componentsHTML.titlesGroup);
+    let typeObj;
+    let sourceObj;
+    let titleObj;
+    let titleInline;
+    // console.log([id, type, sourcePrefix, beginningSource, titles]);
+    typeObj = $(this.componentsHTML.type).append(type);
+    sourceObj = $(this.componentsHTML.source).append(sourcePrefix + beginningSource + sourceSuffix);
+    titleObj = $(this.componentsHTML.title).append(titles[0]);
+    titleInline = $(this.componentsHTML.titleInline).append(typeObj, sourceObj, titleObj);
+    titleInline.attr('id', 'title-' + id);
+    group.append(titleInline);
+    return group;
+};
+
+ParseTimu.prototype.titlesGroupBC = function (
+    {
+        id = this.id,
+        type = this.type,
+        sourcePrefix = this.sourcePrefix,
+        sourceSuffix = this.sourceSuffix,
+        beginningSource = this.source,
+        sourceRange = this.sourceRange,
+        titles = this.title,
+        options = this.options,
+    } = {}) {
+    let group = $(this.componentsHTML.titlesGroup);
+    // BC 的options是列表外包裹字典的形式，因此先转为字典再提取keys
+    let optionKeys = Object.keys(options);
+    let optionLen = Object.keys(options).length;
+    let typeObj;
+    let sourceObj;
+    let titleObj;
+    let titleInline;
+    let select;
+    let option;
+    // console.log(titles);
+
+    for (let i = 0; i < sourceRange; i++) {
+        //生成select
+        select = $(this.componentsHTML.select);
+        select.attr({
+            id: prefixDic.selectId + id + '-' + i,
+            name: prefixDic.selectName + id + '-' + i
+        });
+        for (let n = 0; n < optionLen; n++) {
+            option = $(this.componentsHTML.option);
+            option.attr('value', optionKeys[n]);
+            option.append(optionKeys[n]);
+            select.append(option);
+        }
+        //因为是和A和BC混合处理，因此source显示用和，后台的id 任然用id+'-'+subid
+        typeObj = $(this.componentsHTML.type).append(type);
+        sourceObj = $(this.componentsHTML.source).append(sourcePrefix + (beginningSource * 1 + i) + sourceSuffix);
+        titleObj = $(this.componentsHTML.title).append(titles[i]);
+        titleInline = $(this.componentsHTML.titleInline).append(typeObj, sourceObj, titleObj, select);
+        titleInline.attr('id', 'title-' + id + '-' + i);
+
+        group.append(titleInline);
+    }
+
+    return group;
+};
+
+//生成options(options 是 Map对象)
+ParseTimu.prototype.optionsGroup = function (
+    {
+        id = this.id,
+        inputType = this.type === 'X' ? 'checkbox' : 'radio',
+        hideInput = false,
+        options = this.options,
+        classes
+    } = {}) {
+    let optionsGroupObj = $(this.componentsHTML.optionsGroup);
+    optionsGroupObj = optionsGroupObj.addClass(classes);
+
+    let idPrefix = this.prefixDic[inputType + 'Id'];
+    let namePrefix = this.prefixDic[inputType + 'Name'];
+    let optionInline; // 一行选项的 jquery Obj：将包含 input，optionLable和contentLabel
+    let input; //input的 jquery Obj
+    let inputId; //input 标签的id
+    let optionLabel; // 选项的label obj
+    let contentLabel; // 选项的内容的label obj
+
+
+    for (let i in options) {
+        //初始化各个参数
+        inputId = idPrefix + id + '-' + i;
+        optionInline = $(this.componentsHTML.optionsInline);
+        input = $(this.componentsHTML.input);
+        optionLabel = $(this.componentsHTML.label);
+        contentLabel = $(this.componentsHTML.label);
+        //设置input
+        optionInline.attr('id', namePrefix + id + '-' + i);
+        input.attr({
+            id: inputId,
+            name: namePrefix + id,
+            type: inputType,
+            value: i
+        });
+        input.css({
+            display: hideInput ? 'none' : ''
+        });
+        //设置optionLabel
+        optionLabel.attr({
+            for: inputId
+        });
+        optionLabel.append(i + '.');
+        //设置contentLabel
+        contentLabel.attr({
+            for: inputId
+        });
+        contentLabel.append(options[i]);
+        //设置optionInline
+        optionInline.append(input, optionLabel, contentLabel);
+        //添加到group
+        optionsGroupObj.append(optionInline);
+    }
+    // console.log(optionsGroupObj);
+    return optionsGroupObj;
+};
+
+//生成BC的options
+ParseTimu.prototype.optionsGroupBC = function ({
+                                                   id = this.id,
+                                                   type = this.type,
+                                                   options = this.options,
+                                                   classes
+                                               } = {}) {
+    let optionsGroupObj = $(this.componentsHTML.optionsGroupBC);
+    optionsGroupObj = optionsGroupObj.addClass(classes);
+
+    let optionInline; // 一行选项的 jquery Obj：将包含 input，optionLable和contentLabel
+    let optionLabel; // 选项的label obj
+    let contentLabel; // 选项的内容的label obj
+
+    for (let i in options) {
+        //初始化各个参数
+        optionInline = $(this.componentsHTML.optionsInlineBC);
+        optionLabel = $(this.componentsHTML.label).append(i + '.');
+        contentLabel = $(this.componentsHTML.label).append(options[i]);
+        optionInline.append(optionLabel, contentLabel);
+        optionsGroupObj.append(optionInline);
+    }
+    return optionsGroupObj;
+};
+//生成buttonGroup
+ParseTimu.prototype.buttonsGroup = function () {
+    let buttonsGroup = $(this.componentsHTML.buttonsGroup);
+    let btn;
+    let callback;
+    for (let i in this.buttons) {
+        btn = this.buttons[i].btn;
+        for (let n in this.buttons[i].callback) {
+            // hover 用于处理悬停时的显示和不显示
+            if (n === 'hover') {
+                let parent = this.buttons[i].callback[n].parent;// 获取parent的名称
+                parent = this.parsedObj[parent]; //获取parent的对象
+                let fadeInTime = this.buttons[i].callback[n].in;
+                let fadeOutTime = this.buttons[i].callback[n].out;
+                parent.hover(function () {
+                    btn.fadeIn(fadeInTime);
+                }, function () {
+                    btn.fadeOut(fadeOutTime);
+                });
+            }
+            else
+                //绑定别的事件
+            {
+                btn.on(n, this.buttons[i].callback[n]);
+            }
+        }
+        buttonsGroup.append(btn);
+    }
+    return buttonsGroup;
+};
+
+//生成resultGroup
+ParseTimu.prototype.resultsGroup = function ({ id = this.id, answerList = this.answer, explainList = this.explain } = {}) {
+    let lenAnswerList = answerList.length;
+    let lenExplainList = explainList.length;
+    let max = lenAnswerList >= lenExplainList ? lenAnswerList : lenExplainList;
+    let answer;
+    let answerText;
+    let explain;
+    let explainText;
+    let explainDiv;
+    let resultGroup = $(this.componentsHTML.resultGroup);
+    resultGroup.attr('id', 'resultGroup-' + id);
+    for (let i = 0; i < max; i++) {
+        answerText = answerList[i] === undefined ? '暂无答案，欢迎补充' : answerList[i];
+        explainText = explainList[i] === undefined ? '暂无解析，欢迎补充' : explainList[i];
+        explainDiv = $('<div></div>').append(explainText);
+        answer = $(this.componentsHTML.answer).append(answerText);
+        explain = $(this.componentsHTML.explain).append(explainDiv);
+        resultGroup.append(answer, explain);
+    }
+    return resultGroup;
+};
+
+//生成题目范围
+ParseTimu.prototype.rangeInline = function ({
+                                                type = this.type,
+                                                source = this.source,
+                                                sourceRange = this.sourceRange
+                                            } = {}) {
+    let end = source * 1 + sourceRange * 1 - 1;
+    let text = type === 'B' ? '共用备选答案' : '共用题干';
+    let rangeText = '第 ' + source + ' 到 ' + end + ' 题';
+    let sourceRangeObj = $(this.componentsHTML.sourceRange);
+    return sourceRangeObj.append(rangeText + text);
+};
+
+//生成input文本输入框
+ParseTimu.prototype.inputTitleInline = function ({
+                                                     id = this.id,
+                                                     pos = this.pos,
+                                                     title = this.title[0],
+                                                 } = {}) {
+    let posReg = new RegExp(pos, 'g');
+    let newTitle = $('<p class="title"></p>');
+    let splitedTitle = title.split(posReg).filter(text => text !== '');
+    let input;
+
+    for (let i = 0; i < splitedTitle.length; i++) {
+        newTitle.append('<span>' + splitedTitle[i] + '</span>');
+        if (i < splitedTitle.length - 1) {
+            input = $(this.componentsHTML.input);
+            input.attr({
+                id: prefixDic.textInputId + id + '-' + i,
+                name: prefixDic.textInputName + id + '-' + i,
+            });
+            input.addClass('text-input-tk');
+            newTitle.append(input);
+        }
+    }
+    return newTitle;
+};
+
+ParseTimu.prototype.textareaTitle = function (
+    {
+        id = this.id,
+        classes
+    } = {}
+) {
+    let textareaObj = $(this.componentsHTML.textarea);
+    textareaObj.attr({
+        id: prefixDic.textareaInputId + id,
+        name: prefixDic.textareaInputName + id
+    });
+    return textareaObj;
+
+};
+/*
+* 各个题目分别处理部分
+ */
+ParseTimu.prototype.A = function () {
+    let main = $(this.componentsHTML.main); this.parsedObj['main'] = main;
+    let form = this.form();
+    let titlesGroup = this.titlesGroup();
+    let optionsGroup = this.optionsGroup({ options: this.options[0] });
+    let buttonsGroup = this.buttonsGroup();
+    let resultsGroup = this.resultsGroup();
+    form.append(titlesGroup, optionsGroup, resultsGroup);
+
+    main.append(form, buttonsGroup);
+    return main;
+};
+ParseTimu.prototype.A2 = function () {
+    return this.A();
+};
+ParseTimu.prototype.X = function () {
+    return this.A();
+};
+ParseTimu.prototype.PD = function () {
+    let main = $(this.componentsHTML.main); this.parsedObj['main'] = main;
+    let form = this.form();
+    let titlesGroup = this.titlesGroup();
+    let optionsGroup = this.optionsGroup({ options: { A: '正确', B: '错误' } });
+    let buttonsGroup = this.buttonsGroup();
+    let resultsGroup = this.resultsGroup();
+    form.append(titlesGroup, optionsGroup, resultsGroup);
+
+    main.append(form, buttonsGroup);
+    return main;
+};
+ParseTimu.prototype.B = function () {
+    let main = $(this.componentsHTML.main); this.parsedObj['main'] = main;
+    let form = this.form();
+    let sourceRangeObj = this.rangeInline();
+    let titlesGroup = this.titlesGroupBC();
+    let optionsGroup = this.optionsGroupBC({ options: this.options[0] });
+    let buttonsGroup = this.buttonsGroup();
+    let resultsGroup = this.resultsGroup();
+
+    form.append(optionsGroup, titlesGroup, resultsGroup);
+    main.append(sourceRangeObj, form, buttonsGroup);
+    return main;
+};
+ParseTimu.prototype.C = function () {
+    let main = $(this.componentsHTML.main); this.parsedObj['main'] = main;
+    let form = this.form();
+    let sourceRangeObj = this.rangeInline();
+    let titlesGroup = this.titlesGroupBC();
+    let optionsGroup = this.optionsGroupBC({ options: this.options[0] });
+    let buttonsGroup = this.buttonsGroup();
+    let resultsGroup = this.resultsGroup();
+
+    form.append(titlesGroup, optionsGroup, resultsGroup);
+    main.append(sourceRangeObj, form, buttonsGroup);
+    return main;
+};
+ParseTimu.prototype.A3 = function () {
+    let main = $(this.componentsHTML.main); this.parsedObj['main'] = main;
+    let form = this.form({ bind: false });
+    let sourceRangeObj = this.rangeInline();
+    let infoInline = this.infoInline();
+    let buttonsGroup = this.buttonsGroup();
+    let titleLen = this.title.length;
+    let optionsLen = this.options.length;
+    let sourceRange = this.sourceRange;
+    let max = sourceRange > titleLen || sourceRange > optionsLen ? sourceRange : titleLen > optionsLen ? titleLen : optionsLen;
+
+    //处理子题目，并添加到主容器
+    let subFrom;
+    let subTitlesGroup;
+    let subOptionsGroup;
+    let subResultGroup;
+    let subTitle;
+    for (let i = 0; i < max; i++) {
+        subTitle = this.title[i] === undefined ? ['无题目信息'] : [this.title[i]];
+        subFrom = this.form({ id: this.id + '-' + i });
+        subFrom.attr('id', this.prefixDic.formId + this.id + '-' + i);
+        subTitlesGroup = this.titlesGroup(
+            {
+                id: this.id + '-' + i,
+                type: this.type,
+                beginningSource: this.source * 1 + i,
+                titles: subTitle
+            }
+        );
+        subOptionsGroup = this.optionsGroup({
+            id: this.id + '-' + i,
+            options: this.options[i]
+        });
+        subResultGroup = this.resultsGroup({
+            id: this.id + '-' + i,
+            answerList: [this.answer[i]],
+            explainList: [this.explain[i]],
+        });
+
+        subFrom.append(subTitlesGroup, subOptionsGroup);
+        form.append(subFrom, subResultGroup);
+        // form.after();
+    }
+
+    main.append(sourceRangeObj, infoInline, form, buttonsGroup);
+    return main;
+};
+ParseTimu.prototype.TK = function () {
+    let main = $(this.componentsHTML.main); this.parsedObj['main'] = main;
+    let form = this.form();
+    let inputTitleInlineObj = this.inputTitleInline();
+    let titlesGroup = this.titlesGroup({
+        titles: [inputTitleInlineObj.html()]
+    });
+    let resultsGroup = this.resultsGroup();
+    let buttonsGroup = this.buttonsGroup();
+    form.append(titlesGroup, resultsGroup);
+    main.append(form, buttonsGroup);
+    return main;
+};
+ParseTimu.prototype.MJ = function () {
+    let main = $(this.componentsHTML.main); this.parsedObj['main'] = main;
+    let form = this.form();
+    let moasic = $(this.componentsHTML.moasic);
+    let textarea = this.textareaTitle();
+    let title = this.title[0];
+    let titleHTML = '';
+    let titlesGroup;
+    if (this.inputBox === '0') {
+        titleHTML = title + '：' + moasic.append(this.answer[0]).prop('outerHTML');
+        titlesGroup = this.titlesGroup({
+            titles: [titleHTML]
+        });
+    } else {
+        titleHTML = title + '：<br>' + textarea.prop('outerHTML');
+        titlesGroup = this.titlesGroup({
+            titles: [titleHTML]
+        });
+    }
+    let buttonsGroup = this.buttonsGroup();
+    form.append(titlesGroup);
+    main.append(form, buttonsGroup);
+    return main;
+};
+ParseTimu.prototype.WD = function () {
+    let main = $(this.componentsHTML.main); this.parsedObj['main'] = main;
+    let form = this.form();
+    let moasic = $(this.componentsHTML.moasic);
+    let textarea = this.textareaTitle();
+    let title = this.title[0];
+    let titleHTML = '';
+    let titlesGroup;
+    if (this.inputBox === '0') {
+        titleHTML = title + '<br>答案：<br>' + moasic.append(this.answer[0]).prop('outerHTML');
+        titlesGroup = this.titlesGroup({
+            titles: [titleHTML]
+        });
+    } else {
+        titleHTML = title + '<br>' + textarea.prop('outerHTML');
+        titlesGroup = this.titlesGroup({
+            titles: [titleHTML]
+        });
+    }
+    let buttonsGroup = this.buttonsGroup();
+    form.append(titlesGroup);
+    main.append(form, buttonsGroup);
+    return main;
+};
+
+
+
+
+//从有中文的source中提取最后一个连续数字作为真实的source
+function getRealSource(source) {
+    // console.log(source)
+    let getSuffix = source.match(/\D$/g) === null ? ['']:source.match(/\D$/g);
+    let getContinueNumber = source.match(/[0-9]+/g);
+    let getPrefix = source.split(new RegExp(getContinueNumber.slice(-1),'g'));
+
+    if(getPrefix.length>1){
+        let prefixTemp = ''
+        for(let i=0;i<getPrefix.length-1;i++){
+            prefixTemp += getPrefix[i]
+            if(i<getPrefix.length-2){
+                prefixTemp += getContinueNumber.slice(-1)
+            }
+        }
+        getPrefix = [prefixTemp]
+    }
+
+    let realSource = getContinueNumber[getContinueNumber.length - 1] * 1;
+
+    console.log({ prefix: getPrefix[0], suffix:getSuffix[0], source: realSource })
+    return { prefix: getPrefix[0], suffix:getSuffix[0], source: realSource };
+}
+
+// // 获取select的选项
+function getSelectedAnswer(id) {
+    return formToJSON('#' + prefixDic.formId + id, true, 's');
+}
+
+// // 获取checkbox值
+function getCheckBoxValue(name) {
+    var ids = $('input:checkbox[name="' + name + '"]:checked');
+    var data = [];
+    for (var i = 0; i < ids.length; i++) {
+        data.push(ids[i].value);
+    }
+    // console.log(data);
+    return data;
+}
+
+ParseTimu.prototype.getThisChooseAnswer = function ({ id = this.id, type = this.type, sourceRange = this.sourceRange } = {}) {
+    // console.log(id,type)
+    let result = { array: [], obj: {} };
+    let usersChoice;
+    let counter = 0;
+    if (type === "A" || type === 'A2' || type === 'PD') {
+        let optionGroupName = prefixDic.radioName + id;
+        usersChoice = getSelectedAnswer(id)[optionGroupName];
+        // console.log(usersChoice)
+        result.array.push(usersChoice);
+        result.obj[id] = usersChoice;
+    } else if (type === 'A3') {
+        for (let i = 0; i < sourceRange; i++) {
+            let subId = id + '-' + i;
+            let optionGroupName = prefixDic.radioName + subId;
+            usersChoice = getSelectedAnswer(subId)[optionGroupName];
+            usersChoice = usersChoice === undefined ? '' : usersChoice;
+            result.array.push(usersChoice);
+            result.obj[subId] = usersChoice;
+        }
+    } else if (type === 'B' || type === 'C') {
+        let usersChoice = getSelectedAnswer(id);
+        let answerTemp;
+        for (let i in usersChoice) {
+            answerTemp = usersChoice[i] === undefined ? '' : usersChoice[i];
+            result.array.push(answerTemp);
+            result.obj[id + '-' + counter] = answerTemp;
+            counter += 1;
+        }
+    } else if (type === "X") {
+        let optionGroupName = prefixDic.checkboxName + id;
+        let usersChoice = getCheckBoxValue(optionGroupName).sort();
+        for (let i = 0; i < usersChoice.length; i++) {
+            result.array.push(usersChoice[i]);
+            result.obj[i] = usersChoice[i];
+        }
+    } else if (type === "TK") {
+        let usersChoice = getSelectedAnswer(id);
+        let answerTemp;
+        for (let i in usersChoice) {
+            answerTemp = usersChoice[i] === undefined ? '' : usersChoice[i];
+            result.array.push(answerTemp);
+            result.obj[i] = answerTemp;
+        }
+    } else if (type === "WD" || type === 'MJ') {
+        let textareaId = prefixDic.textareaInputId + id;
+        let usersChoice = getSelectedAnswer(id)[textareaId];
+        result.array.push(usersChoice);
+        result.obj[id] = usersChoice;
+    }
+    // console.log(result);
+    return result;
+};
+
+ParseTimu.prototype.showThisAnswer = function ({ id = this.id, type = this.type, correctAnswer = this.answer, choosedAnswer } = {}) {
+    let isRight = true;
+    let isDone = true;
+    let usersChoiceList = choosedAnswer.array;
+    let usersChoiceObj = choosedAnswer.obj;
+    let correctAnswerTemp;
+    let usersChoice;
+    let counter = 0;
+
+    if (type === "A" || type === 'A2' || type === 'PD' || type === 'A3') {
+        // console.log(choosedAnswer);
+        for (let i in choosedAnswer.obj) {
+            $('#resultGroup-' + i).fadeIn(100);
+            $('#showThisAnswer-' + i).fadeOut(1);
+            usersChoice = usersChoiceObj[i];
+            correctAnswerTemp = correctAnswer[counter];
+            let correctDivObj = $('#' + prefixDic.radioName + i + '-' + correctAnswerTemp);
+            let usersChoiceDivObj = $('#' + prefixDic.radioName + i + '-' + usersChoice);
+            if (usersChoice === correctAnswerTemp) {
+                correctDivObj.addClass('correct');
+            } else {
+                isRight = false;
+                correctDivObj.addClass('correct');
+                usersChoiceDivObj.addClass('wrong');
+            }
+            counter += 1;
+        }
+    } else if (type === 'B' || type === 'C') {
+        for (let i in choosedAnswer.obj) {
+            // console.log('#' + prefixDic.titleInlineId + i);
+            usersChoice = usersChoiceObj[i];
+            correctAnswerTemp = correctAnswer[counter];
+            let targetTitleInline = $('#' + prefixDic.titleInlineId + i);
+            if (usersChoice === correctAnswerTemp) {
+                targetTitleInline.addClass('correct');
+            } else {
+                isRight = false;
+                targetTitleInline.addClass('wrong');
+                targetTitleInline.append('<label class="answerTip">正确答案：' + correctAnswerTemp + '</label>');
+            }
+            counter += 1;
+        }
+    } else if (type === "X") {
+        //x型题的答案是连着的字符串，需要转换成列表再处理
+        correctAnswer = correctAnswer.toString().match(/[A-Z]/g).sort();
+        let lenCorrect = correctAnswer.length;
+        let lenUsersChoose = usersChoiceList.length;
+
+        for (let i = 0; i < lenUsersChoose; i++) {
+            // console.log(usersChoiceList[i]);
+            if (!isInArray(correctAnswer, usersChoiceList[i])) {
+                isRight = false;
+                $('#' + prefixDic.checkboxName + id + '-' + usersChoiceList[i]).addClass('wrong');
+            }
+        }
+        for (let i = 0; i < lenCorrect; i++) {
+            if (!isInArray(usersChoiceList, correctAnswer[i])) {
+                isRight = false;
+                $('#' + prefixDic.checkboxName + id + '-' + correctAnswer[i]).addClass('notChoiced');
+            } else {
+                $('#' + prefixDic.checkboxName + id + '-' + correctAnswer[i]).addClass('correct');
+            }
+        }
+
+    } else if (type === "TK") {
+        for (let i in choosedAnswer.obj) {
+            usersChoice = usersChoiceObj[i];
+            correctAnswerTemp = correctAnswer[counter];
+            correctAnswerTemp = correctAnswerTemp === undefined ? '暂无答案' : correctAnswerTemp;
+            if (usersChoice === correctAnswerTemp) {
+                $('#' + i).replaceWith('<label class="answerTip correct">' + correctAnswerTemp + '</label>');
+            } else {
+                isRight = false;
+                $('#' + i).after('<label class="answerTip wrong">' + correctAnswerTemp + '</label>');
+            }
+            counter += 1;
+        }
+    } else if (type === "WD" || type === 'MJ') {
+        let textareaId = prefixDic.textareaInputId + id;
+        let usersChoice = getSelectedAnswer(id)[textareaId];
+        usersChoice = usersChoice === '' ? '您没有填写回答' : usersChoice;
+        let correctAnswerText = correctAnswer[0] === undefined ? '暂无答案' : correctAnswer[0];
+        let result = '<b>您的回答：</b>';
+        if (usersChoice === correctAnswerText) {
+            result += '<span class="correct">正确</span><br>';
+        } else {
+            isRight = false;
+            result += '<span class="wrong">错误</span><br>';
+        }
+        result += usersChoice + '<br>' + '<b>正确答案：</b><br>' + correctAnswerText;
+        $('#' + textareaId).replaceWith(result);
+
+    }
+    $('#resultGroup-' + id).fadeIn(100);
+    $('#showAnsBtn-' + id).fadeOut(1);
+
+    return isRight;
+};

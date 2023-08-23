@@ -1,20 +1,59 @@
-.subject{
+/*模糊*/
+.blur{
+    filter: blur(7px);
+    transition-duration: 0.1s;
+}
+.blur:focus{
+    filter: blur(0px);
+    transition-duration: 0.3s;
+}
+/*题目*/
+.timuContainer{
+    position:relative;
+    margin-top:4px;
+    font-size: 23px;
+    transition-duration: 300ms;
+}
+
+.timuID{
+    font-size:13px;
+    position:absolute;
+    right: 12px;
+    top: 0px;
+    color:#dedada
+}
+
+.titleInline{
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 1px;
+    border-radius: 4px;
+    padding: 0.1em;
+}
+.titleInline-wrap{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: flex-start;
+    margin-bottom: 2px;
+    border-radius: 4px;
+    padding: 0.2em;
+}
+.titleInline-no-flex{
+    margin-bottom: 2px;
+    border-radius: 4px;
+    padding: 0.2em;
+}
+.info{
+    margin-left: 30px;
     margin-top: 10px;
-    max-width: 95%;
-    word-wrap:break-word
+    padding: 4px;
+    border-radius: 5px;
+    background-color: #ededed;
 }
-.explain{
-    display:inline;
-    white-space: pre-line;
-}
-.type{
-    display: inline;
-    background: #e3e3e3;
-    padding: 2px 2px 2px 2px;
-    border-radius: 10px 0 0 10px;
-    color: #6d6d6d;
-    margin-bottom: 0;
-}
+
 .source{
     display: inline;
     background: #f1f1f1;
@@ -23,90 +62,169 @@
     color: #6d6d6d;
     margin-right: 3px;
     margin-bottom: 0;
+    font-size: 15px;
+    white-space: nowrap;
+}
+.type{
+    display: inline;
+    background: #e3e3e3;
+    padding: 2px 2px 2px 2px;
+    border-radius: 10px 0 0 10px;
+    color: #6d6d6d;
+    margin-bottom: 0;
+    font-size: 15px;
 }
 .title{
-    display: inline;
-    margin-left: 5px;
-    white-space: pre-line;
-}
-.subTitle{
-    display: flex;
-    align-items: flex-start;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    transition-duration: 300ms;
-}
-.titleBC{
     flex-grow: 1;
-    display: flex;
-    align-items: center;
-    margin-bottom: 0;
-    font-size: 28px;
-}
-.info{
-    font-size: 22px;
-    border-radius: 5px;
-    padding: 4px;
-    background-color: #ededed;
-    transition-duration: 300ms;
-}
-.options{
-    display: block;
-    margin-left: 20px;
-    margin-top: 15px;
-}
-.options>.row{
-    margin-bottom: 6px;
-}
-.bcOptions{
-    border-radius: 5px;
-    padding: 4px;
-    background-color: #ededed;
-    transition-duration: 300ms;
-    font-size: 27px;
-}
-.ansContainer{
-    margin-top: 15px;
-    margin-left: 20px;
-}
-.correctAnswer{
     display: inline;
+    margin: 0 1px 0 0!important;
 }
-.options>label{
-    display: block;
-    word-wrap:break-word;
-    max-width: 98%;
-    margin-top: 5px;
+/* dropdown */
+.dropdown{
+    background-color: rgb(234, 234, 234);
+    max-width: 55px;
+    margin-left: 5px;
+    margin-top: 7px;
+    height: 30px;
+    width: 50px;
     border-radius: 5px;
-    font-size: 28px;
+    border: 1px solid rgb(255, 255, 255);
+    text-align: center;
+    -moz-appearance:none; /* Firefox */
+    -webkit-appearance:none; /* Safari 和 Chrome */
+    appearance:none;
+}
+.dropdown-option::-ms-expand{ display: none; }
+.dropdown-option{
+    background-color: rgb(234, 234, 234);
+    text-align: center!important;
+    border-radius: 1px!important;
+    border: 1px solid rgb(255, 255, 255)!important;
+    -moz-appearance:none; /* Firefox */
+    -webkit-appearance:none; /* Safari 和 Chrome */
+    appearance:none;
+}
+/* option */
+.optionInline{
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    align-items: flex-start;
+    border-radius: 5px;
+    margin-bottom: 2px;
+    margin-right: 80px;
+    padding-left:6px;
+}
+.optionInline>input{
+    height:35px!important;
+    width: 20px;
     transition-duration: 300ms;
+    margin:0 5px 0 0!important;
+}
+
+.optionsGroup{
+    display: block;
+    margin-left: 30px;
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.optionsGroup-flex{
+    display: flex;
+    flex-wrap: wrap;
+}
+.optionsGroup-flex>.optionInline>:first-child{
+    font-weight: bold;
+}
+
+.optionsGroupBC{
+    display: block;
+    margin-left: 30px;
+    margin-top: 0;
+    margin-bottom: 5px;
+    column-count: 3;
+}
+/* subject */
+.subjectForm{
+    margin-top: 10px;
+    max-width: 95%;
+    word-wrap:break-word
+}
+
+/* btnGroup */
+.buttonGroup{
+    height: 33px;
+    margin-left: 15px;
+    white-space:nowrap;
+}
+.editThisBtn{
+    display:none;
+    margin-left: 5px;
+    font-size:14px;
+}
+
+/* resultGroup */
+.resultGroup{
+    display: none;
+    margin-top: 15px;
+    margin-left: 20px;
+}
+.answerInline{
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    align-items: center;
+}
+
+.explainInline{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    /*align-items: top;*/
+}
+/* textInput */
+.text-input-tk{
+    display: inline;
+    max-width: 200px;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+.text-input-tk>input{
+    display: inline;
+    width: 200px;
+}
+.text-input-mj{
+    display: inline;
+    max-width: auto;
+}
+
+/*textarea input*/
+.textarea-input{
+    rows:5;
+    width: 100%;
+}
+/* 显示答案的设置 */
+.notChoiced{
+    transition-duration: 500ms;
+    background-color: rgba(238, 226, 40, 0.4);
+    font-weight: bold;
 }
 .correct{
-    transition-duration: 300ms;
+    transition-duration: 500ms;
     background-color: rgba(53, 238, 40,0.4);
     font-weight: bold;
 }
 .wrong{
-    transition-duration: 300ms;
+    transition-duration: 500ms;
     background-color: rgba(255, 79, 79, 0.4);
     font-weight: bold;
 }
-.notChoose{
-    transition-duration: 300ms;
-    background-color: rgb(255, 228, 141);
-    font-weight: bold;
-}
-.typePD>.subject>.options{
-    columns:2 30px;
-    list-style-type:none;
-}
-
-
-.subjectContainer{
-    transition-duration: 300ms;
-}
-input[type=checkbox], input[type=radio]{
-    height: 18px;
-    width: 20px;
-    transition-duration: 300ms;
+.answerTip{
+    display: inline;
+    background: lightgrey;
+    color: darkgreen;
+    padding: 3px;
+    border-radius: 5px;
+    margin-left: 5px;
+    white-space: nowrap;
 }

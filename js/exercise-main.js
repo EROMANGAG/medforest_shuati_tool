@@ -206,22 +206,31 @@ async function showTimu() {
     let type = info.order[progress.absPos].split('-')[0]
     let pos = info.order[progress.absPos].split('-')[1]
     let jsonData = gList().content[type][pos]
+    jsonData = replaceWikitextUNITToHTML(jsonData)
     let id = progress.absPos
     let result = gResults()
     let isDone = result[type][pos]['isDone']
     let choice = result[type][pos]['choice']
     // console.log(JSON.stringify(jsonData))
-    let o = eval('newTimu("' + id + '",' + JSON.stringify(jsonData) + ',true).' + jsonData.type + '()')
+    // let o = eval('newTimu("' + id + '",' + JSON.stringify(jsonData) + ',true).' + jsonData.type + '()')
+    let parseTimu = new ParseTimu(id,jsonData)
+    let o =  parseTimu[jsonData.type]();
     flushContent('.subjectContainer',o,100)
     setTimeout(function () {
         if (isDone||gSautoShowAnswer()) {
             $('#showAnsBtn-'+id).fadeOut(1)
             let targetID = fillUserChoice(id,type,choice,jsonData)
             targetID = targetID === undefined ? id:targetID
-            showAns(targetID, type, jsonData.answer)
+            let choosedAnswer = parseTimu.getThisChooseAnswer();
+            let checkResult = parseTimu.showThisAnswer({ choosedAnswer: choosedAnswer, correctAnswer: parseTimu.answer });
         }
     },300)
-
+    $.getScript("//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML", function() {
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+        // entry-content是文章页的内容div的class
+        var math = document.getElementsByClassName("entry-content")[0];
+        MathJax.Hub.Queue(["Typeset",MathJax.Hub,math]);
+    });
 }
 function flushContent(i,c,t) {
     $(i).animate({ opacity: 0 }, t/2)
@@ -233,21 +242,53 @@ function flushContent(i,c,t) {
 
 }
 function fillUserChoice(id,type,choice,json) {
-    if (type === 'A' ||type === 'A2'|| type === 'X' || type === 'PD') {
-        for (let n = 0; n < choice.length; n++) {
-            $('.' + choice[n]).children('input').attr('checked', true)
-        }
+    if (type === 'A' ||type === 'A2'|| type === 'PD') {
+        fillRadio(id, choice);
+    } else if (type === 'X') {
+        fillCheckbox(id, choice);
     } else if (type === 'B' || type === 'C') {
-        for (let n = 0; n < choice.length; n++) {
-            $('#' + id + '-' + n).children('.titleBC').children('select').find('option:contains(' + choice[n] + ')').attr("selected", true);
-        }
+        fillSelect(id, choice);
     } else if (type === 'A3') {
-        let targetID = []
         let len = json['sourceRange'] * 1
         for (let n = 0; n < len; n++) {
-            $('#' + id + '-' + n).children('.subject').children('.options').children('.' + choice[n]).children('input').attr('checked', true)
-            targetID.push(id + '-' + n)
+            fillRadio(id+'-'+n, choice[n]);
         }
-        return targetID
+    }else if (type === 'TK' ) {
+        fillText(id, choice);
+    } else if (type === 'WD'|| type === 'MJ') {
+        console.log(id,choice)
+        fillTextarea(id, choice);
     }
+}
+
+// // value 是 string
+function fillRadio(id, value) {
+    let target = $('#' + prefixDic.radioId + id + '-' + value);
+    target.attr('checked', 'checked');
+}
+// // 填入checkbox
+// value 是 array
+function fillCheckbox(id, value) {
+    for (var i = 0; i < value.length; i++) {
+        $('#' + prefixDic.checkboxId + id + '-' + value[i]).attr('checked', 'checked');
+    }
+}
+// // 填入Select
+// value 是 array
+function fillSelect(id, value) {
+    for (var i = 0; i < value.length; i++) {
+        $('#' + prefixDic.selectId + id + '-' + i).val(value[i]);
+    }
+}
+// // 填入text
+function fillText(id, value) {
+    for (var i = 0; i < value.length; i++) {
+        // $('#' + prefixDic.textInputId + id + '-' + i).children('input').val(value[i]);
+        $('#' + prefixDic.textInputId + id + '-' + i).val(value[i]);
+    }
+}
+// // 填入textarea
+function fillTextarea(id, value) {
+    console.log(id, value);
+    $('#' + prefixDic.textareaInputId + id).html(value);
 }
